@@ -1,0 +1,50 @@
+
+
+//Class that makes the game function like opening the window where the game is running 
+//,updating the game objects and rendering them on the screen 
+
+// Game.h
+#ifndef GAME_H
+#define GAME_H
+
+#include "GameState.h"
+
+
+class Game
+{
+
+public:
+	// Constructor / Destructor
+	Game();
+	virtual ~Game();
+
+	// Functions
+
+
+	void updateDT();
+	const bool running() const;
+	void update();
+	void updateSFMLEvents();
+	void render();
+	void run();
+
+private:
+	//Variables
+	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+	sf::RenderWindow* window;
+	sf::Event ev;
+
+	sf::Clock dtClock;
+	float dt;
+
+	std::stack<State*> states; //state is an abstract class so we need pointers in order to create objects
+	//we use a stack so that we can put states over each other when we call them ex: if i want to pause my
+	//game the pause state will be stacked upon my game state and when i want to unpause it i pop it off the top 
+
+	//Initializer Functions
+	void initWindow();
+	void initStates();
+
+};
+
+#endif // GAME_H
