@@ -7,8 +7,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "GameState.h"
-
+#include "MainMenuState.h"
 
 class Game
 {
@@ -37,9 +36,11 @@ public:
 
 private:
 	//Variables
-	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+	std::vector<sf::VideoMode> videoModes;
 	sf::RenderWindow* window;
 	sf::Event ev;
+	sf::ContextSettings windowSettings;
+	bool fullscreen;
 
 	sf::Clock dtClock;
 	float dt;
@@ -51,6 +52,7 @@ private:
 	std::map<std::string, int> supportedKeys; //map that holds the supported keys for the game
 
 	//Initializer Functions
+	void initVariables();
 	void initWindow();
 	void initKeys();
 	void initStates();
