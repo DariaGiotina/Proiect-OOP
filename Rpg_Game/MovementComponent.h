@@ -1,5 +1,5 @@
 #ifndef MOVEMENTCOMPONENT_H
-#define MOVECOMPONENT_H
+#define MOVEMENTCOMPONENT_H
 
 #include <vector>
 #include <iostream>
@@ -23,21 +23,24 @@ private:
 	sf::Sprite& sprite;
 
 	float maxVelocity;
+	float acceleration;//how fast the player will reach the max velocity
+	float deceleration;//how fast the player will stop
 
 	sf::Vector2f velocity; //speed
-	sf::Vector2f acceleration;//how fast the player will reach the max velocity
-	sf::Vector2f deceleration;//how fast the player will stop
+	
 
 	//Initializer functions
 
 public:
-	MovementComponent(sf::Sprite& sprite, float maxVelocity);
+	MovementComponent(sf::Sprite& sprite, float maxVelocity, float acceleration, float deceleration);
 	virtual ~MovementComponent();
 
 	//Accessors
     const sf:: Vector2f& getVelocity() const;
 
 	//Functions
+	const bool idle() const;
+
 	void move(const float x, const float y, const float& dt);
 	void update(const float& dt);
 };

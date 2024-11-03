@@ -20,6 +20,9 @@ void MainMenuState::initVariables(){
 		!this->idleTextures["SETTINGS_STATE"].loadFromFile("assets/main_menu/third_button.png") ||
 		!this->hoverTextures["SETTINGS_STATE"].loadFromFile("assets/main_menu/third_button_hover.png") ||
 		!this->activeTextures["SETTINGS_STATE"].loadFromFile("assets/main_menu/third_button_active.png") ||
+		!this->idleTextures["EDITOR_STATE"].loadFromFile("assets/main_menu/fourth_button.png") ||
+		!this->hoverTextures["EDITOR_STATE"].loadFromFile("assets/main_menu/fourth_button_hover.png") ||
+		!this->activeTextures["EDITOR_STATE"].loadFromFile("assets/main_menu/fourth_button_active.png") ||
 		!this->idleTextures["EXIT_STATE"].loadFromFile("assets/main_menu/fifth_button.png") ||
 		!this->hoverTextures["EXIT_STATE"].loadFromFile("assets/main_menu/fifth_button_hover.png") ||
 		!this->activeTextures["EXIT_STATE"].loadFromFile("assets/main_menu/fifth_button_active.png"))
@@ -68,23 +71,28 @@ void MainMenuState::initKeybinds()
 void MainMenuState::initButtons()
 {
 
-	this->buttons["GAME_STATE"] = new Button(80, 116, 500, 250,
+	this->buttons["GAME_STATE"] = new Button(80, 76, 500, 250,
 		&this->font, "New Game",
 		this->idleTextures["GAME_STATE"], this->hoverTextures["GAME_STATE"], this->activeTextures["GAME_STATE"]
 
 	);
 
-	this->buttons["LOAD_STATE"] = new Button(70, 316, 500, 200,
+	this->buttons["LOAD_STATE"] = new Button(70, 266, 500, 200,
 		&this->font, "Load Game",
 		this->idleTextures["LOAD_STATE"], this->hoverTextures["LOAD_STATE"], this->activeTextures["LOAD_STATE"]
 		);
 
-	this->buttons["SETTINGS_STATE"] = new Button(70, 466, 480, 250,
+	this->buttons["SETTINGS_STATE"] = new Button(60, 416, 480, 250,
 		&this->font, "Settings",
 		this->idleTextures["SETTINGS_STATE"], this->hoverTextures["SETTINGS_STATE"], this->activeTextures["SETTINGS_STATE"]
 		);
 
-	this->buttons["EXIT_STATE"] = new Button(60, 650, 500, 250,
+	this->buttons["EDITOR_STATE"] = new Button(70, 586, 480, 250,
+		&this->font, "Editor",
+		this->idleTextures["EDITOR_STATE"], this->hoverTextures["EDITOR_STATE"], this->activeTextures["EDITOR_STATE"]
+	);
+
+	this->buttons["EXIT_STATE"] = new Button(60, 750, 500, 250,
 		&this->font, "Quit",
 		this->idleTextures["EXIT_STATE"], this->hoverTextures["EXIT_STATE"], this->activeTextures["EXIT_STATE"]
 		);

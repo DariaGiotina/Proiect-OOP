@@ -23,16 +23,16 @@ ifs.close();
 
 void GameState::initTextures()
 {
-	if(!this->textures["PLAYER_IDLE"].loadFromFile("assets/player/sprite.png"))
+	if (!this->textures["PLAYER_SHEET"].loadFromFile("assets/Knight_player/Idle_KG_1.png"))
 	{
-		throw  "ERROR::GAME_STATE::COULD_NOT_LOAD_PLAYER_IDLE_TEXTURE";
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_PLAYER_TEXTURE");
 	}
 }
 
 void GameState::initPlayers()
 {
-	this->player = new Player(0, 0, this->textures["PLAYER_IDLE"]);
-	this->player->setScale(0.5f, 0.5f); 
+	this->player = new Player(0, 0, this->textures["PLAYER_SHEET"]);
+	this->player->setScale(2.f, 2.f); 
 }
 
 
@@ -58,13 +58,13 @@ void GameState::updateInput(const float & dt)
 
 //Update player input
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_LEFT"))))
-	this->player->move(dt, -1.f, 0.f);
+	this->player->move (- 1.f, 0.f,dt);
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
-	this->player->move(dt, 1.f, 0.f);
+	this->player->move( 1.f, 0.f, dt);
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_UP"))))
-	this->player->move(dt, 0.f, -1.f);
+	this->player->move( 0.f, -1.f,dt);
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
-	this->player->move(dt, 0.f, 1.f);
+	this->player->move( 0.f, 1.f, dt);
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))))
     this->endState();
 }

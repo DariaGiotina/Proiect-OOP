@@ -127,6 +127,7 @@ void Game::updateSFMLEvents()
 
 void Game::update() //function that updates the states of the game
 {
+
    this->updateSFMLEvents(); // updates the events of the game
 
    if (!this->states.empty())

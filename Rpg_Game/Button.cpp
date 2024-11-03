@@ -15,7 +15,7 @@ Button::Button(float x, float y, float width, float height,
 	this->text.setFont(*this->font);
     this->text.setString(text);
 	this->text.setFillColor(sf::Color::Black);
-	this->text.setCharacterSize(36);
+	this->text.setCharacterSize(40);
 
 	// Center the text within the button
 	sf::FloatRect textRect = this->text.getLocalBounds();
