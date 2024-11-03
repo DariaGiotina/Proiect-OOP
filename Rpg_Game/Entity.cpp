@@ -3,7 +3,6 @@
 void Entity::initVariables()
 {
 
-	this->movementComponent = nullptr;
 }
 
 Entity::Entity()
