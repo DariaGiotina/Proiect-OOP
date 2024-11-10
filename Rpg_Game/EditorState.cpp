@@ -1,6 +1,6 @@
+#include "stdafx.h"
 #include "EditorState.h"
 #include "GameState.h"  
-#include <fstream> // Include the fstream header to fix incomplete type error
 
 //Initializer functions
 void EditorState::initVariables() {
@@ -15,7 +15,6 @@ void EditorState::initBackground()
 {
 
 }
-
 
 void EditorState::initFonts()
 {
@@ -43,27 +42,31 @@ void EditorState::initKeybinds()
 
 }
 
+void EditorState::initPauseMenu()
+{
+	this->pmenu = new PauseMenu(*this->window, this->font);
+
+	this->pmenu->addButton("MAIN MENU", 670.f, 560.f, "MAIN MENU");
+	this->pmenu->addButton("QUIT", 670.f, 740.f, "QUIT");
+
+}
+
 void EditorState::initButtons()
 {
-
-	//this->buttons["GAME_STATE"] = new Button(80, 76, 500, 250,
-	//	&this->font, "New Game",
-	//	this->idleTextures["GAME_STATE"], this->hoverTextures["GAME_STATE"], this->activeTextures["GAME_STATE"]
-
-	//);
 
 	
 }
 
 //Constructor / Destructor
 
-EditorState::EditorState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
-	: State(window, supportedKeys, states)
+EditorState::EditorState(StateData* state_data)
+	: State(state_data)
 {
 	this->initVariables();
 	this->initBackground();
 	this->initFonts();
 	this->initKeybinds();
+	this->initPauseMenu();
 	this->initButtons();
 
 }
@@ -75,16 +78,24 @@ EditorState::~EditorState()
 	{
 		delete it->second;
 	}
+	delete this->pmenu;
 }
 
 //Functions
 
 void EditorState::updateInput(const float& dt)
 {
-
-if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))))
-		this->endState();
-
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeyTime())
+	{
+		if (!this->paused)
+		{
+			this->pauseState();
+		}
+		else
+		{
+			this->unpauseState();
+		}
+	}
 }
 
 void EditorState::updateButtons()
@@ -97,17 +108,40 @@ void EditorState::updateButtons()
 
 }
 
+void EditorState::updatePauseMenuButtons()
+{
+	if (this->pmenu->isButtonPressed("MAIN MENU"))
+	{
+		this->endState();
+	}
+
+	if (this->pmenu->isButtonPressed("QUIT"))
+	{
+		this->window->close();
+	}
+}
+
 void EditorState::update(const float& dt)
 {
 	this->updateMousePositions();
-
+	this->updateKeyTime(dt);
 	this->updateInput(dt);
-	this->updateButtons();
+
+	if (!this->paused) //Unpaused
+	{
+		this->updateButtons();
+	}
+	else //Paused
+	{
+		this->pmenu->update(this->mousePosView);
+		this->updatePauseMenuButtons();
+	}
+
 
 
 }
 
-void EditorState::renderButtons(sf::RenderTarget* target)
+void EditorState::renderButtons(sf::RenderTarget& target)
 {
 	for (auto& it : this->buttons)
 	{
@@ -121,8 +155,14 @@ void EditorState::render(sf::RenderTarget* target)
 	{
 		target = this->window;
 	}
-	this->renderButtons(target);
+	this->renderButtons(*target);
 
+	this->map.render(*target);
+
+	if (this->paused) //paused menu render
+	{
+		this->pmenu->render(*target);
+	}
 
 	//REMOVE LATER
 	/*sf::Text mouseText;
