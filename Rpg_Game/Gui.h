@@ -66,5 +66,42 @@ class DropDownList
 		void render(sf::RenderTarget& target);
 };
 
+class TextureSelector
+{
+private:
+	sf::RectangleShape bounds;
+	sf::Sprite sheet;
+	sf::RectangleShape selector;
+	sf::Vector2u mousePosGrid;
+	sf::IntRect textureRect;
+	sf::Texture idleTexture;
+	sf::Texture hoverTexture;
+	sf::Texture activeTexture;
+
+	float gridSize;
+	float keyTime;
+	const float keyTimeMax;
+	bool active;
+	bool hidden;
+
+	gui::Button * hide_btn;
+
+	//Functions
+	void initVariables();
+public:
+	TextureSelector(float x,float y, float width, float height, float gridSize, const sf::Texture* textuer_sheet,
+		sf::Font& font);
+	~TextureSelector();
+
+	//Accessors
+	const bool& getActive() const;
+	const sf::IntRect& getTextureRect() const;
+
+	//Functions
+	const bool getKeyTime();
+	void updateKeyTime(const float& dt);
+	void update(const sf::Vector2i& mousePosWindow, const float& dt);
+	void render(sf::RenderTarget& target);
+};
 }
 #endif // !BUTTON_H

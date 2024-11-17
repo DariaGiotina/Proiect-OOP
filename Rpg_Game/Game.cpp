@@ -6,7 +6,7 @@ void Game::initVariables()
 	this->window = nullptr;
 	this->dt = 0.f;
 	this->dtClock.restart();
-	this->gridSize = 50.f;
+	this->gridSize = 100.f;
 }
 
 void Game::initGraphicsSettings()

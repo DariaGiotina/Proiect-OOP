@@ -13,10 +13,8 @@ class State;
 class StateData
 {
 public:
-	StateData()
-	{
+	StateData() {};
 
-	}
 	//Variables
 	float gridSize;
 	sf::RenderWindow* window;
@@ -43,6 +41,7 @@ protected:
 	sf::Vector2i mousePosScreen;
 	sf::Vector2i mousePosWindow;
 	sf::Vector2f mousePosView;
+	sf::Vector2u mousePosGrid;
 
 	//Resources
 	std::map<std::string,sf::Texture> textures;

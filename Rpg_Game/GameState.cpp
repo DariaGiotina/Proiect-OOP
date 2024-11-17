@@ -51,6 +51,11 @@ void GameState::initPlayers()
 	this->player->setScale(2.f, 2.f); 
 }
 
+void GameState::initTileMap()
+{
+	this->tileMap = new TileMap(this->stateData->gridSize, 10, 10);
+}
+
 
 //Constructor / Destructor
 GameState::GameState(StateData* state_data)
@@ -62,13 +67,14 @@ this->initTextures();
 this->initPauseMenu();
 
 this->initPlayers();
-
+this->initTileMap();
 }
 
 GameState::~GameState()
 {
 	delete this->pmenu;
 	delete this->player;
+	delete this->tileMap;
 }
 
 //Functions
