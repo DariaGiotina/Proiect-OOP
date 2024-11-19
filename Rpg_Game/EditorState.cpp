@@ -55,7 +55,9 @@ void EditorState::initPauseMenu()
 {
 	this->pmenu = new PauseMenu(*this->window, this->font);
 
-	this->pmenu->addButton("MAIN MENU", 670.f, 560.f, "MAIN MENU");
+	this->pmenu->addButton("MAIN MENU", 670.f, 210.f, "MAIN MENU");
+	this->pmenu->addButton("LOAD", 670.f, 380.f, "LOAD");
+	this->pmenu->addButton("SAVE", 670.f, 560.f, "SAVE");
 	this->pmenu->addButton("QUIT", 670.f, 740.f, "QUIT");
 
 }
@@ -91,7 +93,7 @@ void EditorState::initGui()
 
 void EditorState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize,10,10);
+	this->tileMap = new TileMap(this->stateData->gridSize,10,10,"assets/The_Fan-tasy_Tileset/Art/Ground_Tileset_100x100/4_textures.png");
 }
 
 //Constructor / Destructor
@@ -141,9 +143,9 @@ void EditorState::updateInput(const float& dt)
 
 void EditorState::updateEditorInput(const float& dt)
 {
-	if(!this->sidebar.getGlobalBounds().contains(sf::Vector2f(this->mousePosWindow)))
-	{ 
-	//Add a tile to the tilemap
+	if (!this->sidebar.getGlobalBounds().contains(sf::Vector2f(this->mousePosWindow)))
+	{
+		//Add a tile to the tilemap
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->getKeyTime())
 		{
 			if (!this->textureSelector->getActive())
@@ -155,18 +157,16 @@ void EditorState::updateEditorInput(const float& dt)
 				this->textureRect = this->textureSelector->getTextureRect();
 			}
 		}
-	 
-	}
-	//Remove a tile from the tilemap
-	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && this->getKeyTime())
-	{
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->getKeyTime())
+
+
+
+		//Remove a tile from the tilemap
+		else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && this->getKeyTime())
 		{
 			if (!this->textureSelector->getActive())
 				this->tileMap->removeTile(this->mousePosGrid.x, this->mousePosGrid.y, 0);
 		}
 	}
-
 
 }
 
@@ -209,6 +209,16 @@ void EditorState::updatePauseMenuButtons()
 	if (this->pmenu->isButtonPressed("QUIT"))
 	{
 		this->window->close();
+	}
+
+	if (this->pmenu->isButtonPressed("SAVE"))
+	{
+		this->tileMap->saveToFile("test.rpg");
+	}
+
+	if (this->pmenu->isButtonPressed("LOAD"))
+	{
+		this->tileMap->loadFromFile("test.rpg");
 	}
 }
 

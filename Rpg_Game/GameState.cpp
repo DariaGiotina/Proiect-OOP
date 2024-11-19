@@ -53,7 +53,7 @@ void GameState::initPlayers()
 
 void GameState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 10, 10);
+	this->tileMap = new TileMap(this->stateData->gridSize, 10, 10, "assets\The Fan-tasy Tileset\Art\Ground Tileset 100x100\4_textures.png");
 }
 
 

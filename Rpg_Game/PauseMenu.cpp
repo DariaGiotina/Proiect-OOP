@@ -59,32 +59,35 @@ const bool PauseMenu::isButtonPressed(const std::string key)
 void PauseMenu::addButton(const std::string key, float x, float y, const std::string text)
 {
 	sf::Color textColor = sf::Color::White;
-	this->buttons["RESUME"] = new gui::Button 
+	this->buttons["MAIN MENU"] = new gui::Button 
 	   (670.f, 210.f, 600.f, 200.f,
-		   &this->font, "RESUME", textColor,
+		   &this->font, "MAIN MENU", textColor,
 		this->idleTexture, this->hoverTexture, this->activeTexture
 
 	);
 	
-	this->buttons["SETTINGS"] = new gui::Button
+	this->buttons["LOAD"] = new gui::Button
 	   (670.f,380.f, 600.f, 200.f,
-		&this->font, "SETTINGS", textColor,
+		&this->font, "LOAD", textColor,
 		this->idleTexture, this->hoverTexture, this->activeTexture
 
 	);
 
-	this->buttons["MAIN MENU"] = new gui::Button
+	this->buttons["SAVE"] = new gui::Button
 	   (670.f, 560.f, 600.f, 200.f,
-		&this->font, "MAIN MENU", textColor,
+		&this->font, "SAVE", textColor,
 		this->idleTexture, this->hoverTexture, this->activeTexture
 
 	);
 	this->buttons["QUIT"] = new gui::Button
 	    (670.f, 740.f, 600.f, 200.f,
-		&this->font, "EXIT", textColor,
+		&this->font, "QUIT", textColor,
 		this->idleTexture, this->hoverTexture, this->activeTexture
 
 	);
+
+
+
 }
 
 void PauseMenu::update(const sf::Vector2f& mousePos)
