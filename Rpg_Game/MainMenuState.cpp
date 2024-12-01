@@ -70,6 +70,11 @@ void MainMenuState::initKeybinds()
 
 }
 
+void MainMenuState::initGui()
+{
+	const sf::VideoMode& vm = this->stateData->gfxSettings->resolution;
+}
+
 void MainMenuState::initButtons()
 {
 	sf::Color newGameColor = sf::Color::Black;
@@ -110,6 +115,7 @@ MainMenuState::MainMenuState(StateData* state_data)
 	this->initBackground();
 	this->initFonts();
 	this->initKeybinds();
+	this->initGui();
 	this->initButtons();
 
 }
@@ -128,7 +134,6 @@ MainMenuState::~MainMenuState()
 void MainMenuState::updateInput(const float& dt)
 {
 
-
 	/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
 	{
 
@@ -141,7 +146,7 @@ void MainMenuState::updateButtons()
 	//Updates all the buttons in the state and handles their functionality
 	for (auto& it : this->buttons)
 	{
-		it.second->update(this->mousePosView);
+		it.second->update(this->mousePosWindow);
 	}
 	//New Game
 	if (this->buttons["GAME_STATE"]->isPressed())

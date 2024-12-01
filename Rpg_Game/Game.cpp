@@ -65,14 +65,17 @@ void Game::initKeys()
 void Game::initStateData()
 {
 	this->stateData.window = this->window;
+    this->stateData.gfxSettings = &this->gfxSettings;
 	this->stateData.supportedKeys = &this->supportedKeys;
 	this->stateData.states = &this->states;
-	this ->stateData.gridSize = this->gridSize;
+	this->stateData.gridSize = this->gridSize;
 }
 
 void Game::initStates()
 {
    this->states.push(new MainMenuState(&this->stateData));
+
+
    //this->states.push(new GameState(this->window, &this->supportedKeys)); //pushes a new game state object to the top of the stack
 }
 

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Gui.h"
 
+/////////////////////////Button
+
 //Initializer functions
 gui::Button::Button(float x, float y, float width, float height,
 	sf::Font* font, std::string text,sf::Color color,
@@ -69,13 +71,13 @@ void gui::Button::setText(const std::string text)
 }
 
 //Functions
-void gui::Button::update(const sf::Vector2f& mousePos)
+void gui::Button::update(const sf::Vector2i& mousePosWindow)
 {
 	//Idle
 	this->buttonState = BTN_IDLE;
 
 	//Hover
-	if (this->shape.getGlobalBounds().contains(mousePos))
+	if (this->shape.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosWindow)))
 	{
 		this->buttonState = BTN_HOVER;
 
@@ -109,7 +111,7 @@ void gui::Button::render(sf::RenderTarget& target)
 }
 
 
-//DropDownList class
+////////////////////////DropDownList class
 
 void gui::DropDownList::initVariables()
 {
@@ -137,7 +139,6 @@ gui::DropDownList::DropDownList(sf::Font& font, std::string list[],unsigned nrOf
 	this->activeElement = new Button(*this->list[default_index]);
 }
 
-
 gui::DropDownList::~DropDownList()
 {
 	delete this->activeElement;
@@ -147,7 +148,7 @@ gui::DropDownList::~DropDownList()
 	}
 }
 
-void gui::DropDownList::update(const sf::Vector2f& mousePos)
+void gui::DropDownList::update(const sf::Vector2i& mousePosWindow)
 {
 }
 
@@ -156,8 +157,7 @@ void gui::DropDownList::render(sf::RenderTarget& target)
 }
 
 
-//TextureSelector class
-
+////////////////////////TextureSelector class
 
 //Functions
 void gui::TextureSelector::initVariables()
@@ -212,7 +212,7 @@ gui::TextureSelector::TextureSelector(float x, float y, float width, float heigh
 	sf::Color newGameColor = sf::Color::White;
 
 	this->hide_btn = new gui::Button(
-		x+60.f, y+200.f, 200.f, 100.f,
+		x-50.f, y+0.f, 200.f, 100.f,
 		&font, "Hide", newGameColor,
 		this->idleTexture, this->hoverTexture, this->activeTexture
 	);
@@ -224,7 +224,6 @@ gui::TextureSelector::~TextureSelector()
 }
 
 //Accessors
-
 const bool& gui::TextureSelector::getActive() const
 {
 	return this->active;
@@ -256,7 +255,7 @@ void gui::TextureSelector::update(const sf::Vector2i& mousePosWindow,const float
 {
 
 	this->updateKeyTime(dt);
-	this->hide_btn->update(static_cast<sf::Vector2f>(mousePosWindow));
+	this->hide_btn->update(mousePosWindow);
 
 	if (this->hide_btn->isPressed() && this->getKeyTime())
 	{
@@ -266,27 +265,26 @@ void gui::TextureSelector::update(const sf::Vector2i& mousePosWindow,const float
 			this->hidden = true;
 	}
 
-	this->hide_btn->update(static_cast<sf::Vector2f>(mousePosWindow));
-	if (!this->hidden) {
-
-	
-
-	if (this->bounds.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosWindow)))
-		this->active = true;
-	else
+	this->hide_btn->update(mousePosWindow);
+	if (!this->hidden)
+	{
 		this->active = false;
 
-	if (this->active)
+		if (this->bounds.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosWindow)))
 		{
-		this->mousePosGrid.x = (mousePosWindow.x - static_cast<int>(this->bounds.getPosition().x)) / static_cast<unsigned>(this->gridSize);
-		this->mousePosGrid.y = (mousePosWindow.y - static_cast<int>(this->bounds.getPosition().y)) / static_cast<unsigned>(this->gridSize);
-		this->selector.setPosition(
-			this->bounds.getPosition().x + this->mousePosGrid.x * this->gridSize,
-			this->bounds.getPosition().y + this->mousePosGrid.y * this->gridSize);
+			this->active = true;
 
-		//Update texture rectangle
-		this->textureRect.left = static_cast<int>(this->selector.getPosition().x - this->bounds.getPosition().x);
-		this->textureRect.top = static_cast<int>(this->selector.getPosition().y - this->bounds.getPosition().y);
+			this->mousePosGrid.x = (mousePosWindow.x - static_cast<int>(this->bounds.getPosition().x)) / static_cast<unsigned>(this->gridSize);
+			this->mousePosGrid.y = (mousePosWindow.y - static_cast<int>(this->bounds.getPosition().y)) / static_cast<unsigned>(this->gridSize);
+
+			this->selector.setPosition(
+				this->bounds.getPosition().x + this->mousePosGrid.x * this->gridSize,
+				this->bounds.getPosition().y + this->mousePosGrid.y * this->gridSize
+			);
+
+			//Update texture rectangle
+			this->textureRect.left = static_cast<int>(this->selector.getPosition().x - this->bounds.getPosition().x);
+			this->textureRect.top = static_cast<int>(this->selector.getPosition().y - this->bounds.getPosition().y);
 		}
 	}
 }

@@ -19,6 +19,7 @@ Entity::~Entity()
 	delete this->hitboxComponent;
 	delete this->movementComponent;
 	delete this->animationComponent;
+	delete this->attributeComponent;
 
 }
 
@@ -46,9 +47,18 @@ void Entity::createAnimationComponent(sf::Texture& texture_sheet)
 	this->animationComponent = new AnimationComponent(this->sprite, texture_sheet);
 }
 
+void Entity::createAttributeComponent(const unsigned level)
+{
+	this->attributeComponent = new AttributeComponent(level);
+}
 
 
-//Functions
+// Functions
+const sf::Vector2f& Entity::getPosition() const
+{
+	return this->sprite.getPosition();
+}
+
 void Entity::setPosition(const float x, const float y)
 {
 	

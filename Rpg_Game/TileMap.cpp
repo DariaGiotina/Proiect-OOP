@@ -62,7 +62,7 @@ const sf::Texture* TileMap::getTileSheet() const
 	return &this->tileSheet;
 }
 
-void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z, const sf::IntRect& texture_rect)
+void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z, const sf::IntRect& texture_rect, const bool& collision, const short& type)
 {
 	//Take three indicies from the mouse pos in the grid and add a tile to that position if the internat tilemap array allows it
 
@@ -70,9 +70,9 @@ void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z, cons
 		y < this->maxSize.y && y >= 0 &&
 		z < this->layers && z >= 0)
 	{
-		if (this->map[x][y][z] == nullptr) //ok to add tile
+		if (this->map[x][y][z] == NULL) //ok to add tile
 		{
-			this->map[x][y][z] = new Tile(x, y, this->gridSizeF, this->tileSheet, texture_rect);
+			this->map[x][y][z] = new Tile(x, y, this->gridSizeF, this->tileSheet, texture_rect,collision,type);
 			std::cout << "DEBUG: ADDED TILE!" << "\n";
 		}
 

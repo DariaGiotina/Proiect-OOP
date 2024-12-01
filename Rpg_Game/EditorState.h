@@ -17,6 +17,8 @@ class EditorState :
 {
 private:
 	//Variables
+	sf::View view;
+
 	sf::Font font;
 	sf::Text cursorText;
 	PauseMenu* pmenu;
@@ -31,6 +33,10 @@ private:
 	sf::RectangleShape selectorRect;
 	gui::TextureSelector* textureSelector;
 
+	bool collision;
+	short type;
+	float cameraSpeed;
+
 	// Textures for buttons
 	sf::Texture idleTexture;
 	sf::Texture hoverTexture;
@@ -42,6 +48,7 @@ private:
 	std::map<std::string, sf::Texture> activeTextures;
 	//Functions
 	void initVariables();
+	void initView();
 	void initBackground();
 	void initFonts();
 	void initText();

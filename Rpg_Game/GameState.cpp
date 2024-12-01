@@ -1,7 +1,28 @@
 #include "stdafx.h"
 #include "GameState.h"  
 
+
 //Initializer functions
+void GameState::initDeferredRender()
+{
+	this->renderTexture.create(this->stateData->gfxSettings->resolution.width,
+		this->stateData->gfxSettings->resolution.height);
+
+	this->renderSprite.setTexture(this->renderTexture.getTexture());
+	this->renderSprite.setTextureRect(sf::IntRect(0, 0, 
+		this->stateData->gfxSettings->resolution.width,
+		this->stateData->gfxSettings->resolution.height));
+}
+
+void GameState::initView()
+{
+	this->view.setSize(sf::Vector2f(this->stateData->gfxSettings->resolution.width, 
+		this->stateData->gfxSettings->resolution.height));
+
+	this->view.setCenter(this->stateData->gfxSettings->resolution.width / 2.f,
+		this->stateData->gfxSettings->resolution.height / 2.f);
+}
+
 void GameState::initKeybinds()
 {
 std::ifstream ifs("Config/gamestate_keybinds.ini"); 
@@ -51,9 +72,15 @@ void GameState::initPlayers()
 	this->player->setScale(2.f, 2.f); 
 }
 
+void GameState::initPlayerGUI()
+{
+	this->playerGUI = new PlayerGUI(this->player);
+}
+
 void GameState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 10, 10, "assets\The Fan-tasy Tileset\Art\Ground Tileset 100x100\4_textures.png");
+	this->tileMap = new TileMap(this->stateData->gridSize, 100, 100, "assets/The_Fan-tasy_Tileset/Art/Ground_Tileset_100x100/4_textures.png");
+	this->tileMap->loadFromFile("test.rpg");
 }
 
 
@@ -61,12 +88,15 @@ void GameState::initTileMap()
 GameState::GameState(StateData* state_data)
 	: State(state_data)
 {
+this->initDeferredRender();
+this->initView();
 this->initKeybinds();
 this->initFonts();
 this->initTextures();
 this->initPauseMenu();
 
 this->initPlayers();
+this->initPlayerGUI();
 this->initTileMap();
 }
 
@@ -75,9 +105,15 @@ GameState::~GameState()
 	delete this->pmenu;
 	delete this->player;
 	delete this->tileMap;
+	delete this->playerGUI;
 }
 
 //Functions
+
+void GameState::updateView(const float& dt)
+{
+	this->view.setCenter(this->player->getPosition());
+}
 
 void GameState::updateInput(const float& dt)
 {
@@ -105,10 +141,28 @@ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT")
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_UP"))))
 	this->player->move( 0.f, -1.f,dt);
 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
-	this->player->move( 0.f, 1.f, dt);
+	this->player->move(0.f, 1.f, dt);
 
 
 }
+
+void GameState::updatePlayerGUI(const float& dt)
+{
+	this->playerGUI->update(dt);
+}
+
+void GameState::getToEnemyState(const float& dt)
+{
+	sf::Vector2f playerPosition = this->player->getPosition();
+	sf::Vector2f targetPosition(2150.f,1110.f); // Example target position
+
+	if (playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
+	{
+		this->stateData->states->push(new EnemyState(this->stateData));
+	}
+}
+
+
 
 void GameState::updatePauseMenuButtons()
 {
@@ -126,21 +180,27 @@ void GameState::updatePauseMenuButtons()
 
 void GameState::update(const float& dt)
 {
-	this->updateMousePositions();
+	this->updateMousePositions(&this->view);
 	this->updateKeyTime(dt);
 	this->updateInput(dt);
+	this->getToEnemyState(dt);
 
 	if (!this->paused) //unpaused update
 	{
+		this->updateView(dt);
 	
 		this->updatePlayerInput(dt);
 
 		this->player->update(dt);
+
+		this->playerGUI->update(dt);
+
+	
     }
 	else //paused update
 	{
 	
-		this->pmenu->update(this->mousePosView);
+		this->pmenu->update(this->mousePosWindow);
 		this->updatePauseMenuButtons();
 	}
 
@@ -152,13 +212,26 @@ if (!target)
 {
 	target = this->window;
 }
-//this->map.render(*target);
+this->renderTexture.clear();
 
-this->player->render(*target);
+this->renderTexture.setView(this->view);
+this->tileMap->render(this->renderTexture);
+
+this->player->render(this->renderTexture);
+
+//Render GUI
+this->renderTexture.setView(this->renderTexture.getDefaultView());
+this->playerGUI->render(this->renderTexture);
 
 if (this->paused) //paused menu render
 {
-	this->pmenu->render(*target);
+	//this->renderTexture.setView(this->renderTexture.getDefaultView());
+	this->pmenu->render(this->renderTexture);
 }
+
+//Final render
+this->renderTexture.display();
+this->renderSprite.setTexture(this->renderTexture.getTexture());
+target->draw(this->renderSprite);
 
 }

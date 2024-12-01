@@ -35,7 +35,7 @@ public:
 	void setText(const std::string text);	
 
 	//Functions
-	void update(const sf::Vector2f& mousePos);
+	void update(const sf::Vector2i& mousePosWindow);
 	void render(sf::RenderTarget& target);
 
 	
@@ -62,7 +62,7 @@ class DropDownList
 		~DropDownList();
 
 		//Functions
-		void update(const sf::Vector2f& mousePos);
+		void update(const sf::Vector2i& mousePosWindow);
 		void render(sf::RenderTarget& target);
 };
 

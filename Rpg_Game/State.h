@@ -6,8 +6,11 @@
 
 //abstract class to keep the resources of the game and the base for other states
 // like the main menu or game state
+#include "GraphicsSettings.h"
+
 
 class Player;
+class GraphicsSettings;
 class State;
 
 class StateData
@@ -18,6 +21,7 @@ public:
 	//Variables
 	float gridSize;
 	sf::RenderWindow* window;
+	GraphicsSettings* gfxSettings;
 	std::map<std::string, int>* supportedKeys;
 	std::stack<State*>* states;
 
@@ -65,7 +69,7 @@ public:
 	void pauseState();
 	void unpauseState();
 
-	virtual void updateMousePositions();
+	virtual void updateMousePositions(sf::View* view = NULL);
 	virtual void updateKeyTime(const float& dt);
 	virtual void updateInput(const float& dt) = 0;
     virtual void update(const float& dt) = 0;

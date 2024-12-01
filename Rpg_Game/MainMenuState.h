@@ -6,6 +6,7 @@
 #include "EditorState.h"
 #include "SettingsState.h"
 
+
 class MainMenuState :
     public State
 {
@@ -32,6 +33,7 @@ private:
 	void initBackground();
 	void initFonts();
 	void initKeybinds();
+	void initGui();
 	void initButtons();
 
 public:
