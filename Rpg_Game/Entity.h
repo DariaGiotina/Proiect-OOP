@@ -5,6 +5,7 @@
 #include "AnimationComponent.h"
 #include "HitboxComponent.h"
 #include "AttributeComponent.h"
+//#include "EnemyState.h"
 
 class MovementComponent;
 class AnimationComponent;
@@ -17,7 +18,7 @@ private:
 	void initVariables();
 
 protected: //objects can be accesed in the child class
-	sf::Sprite sprite;
+
 
 	HitboxComponent* hitboxComponent;
 	MovementComponent* movementComponent;
@@ -25,10 +26,12 @@ protected: //objects can be accesed in the child class
 	AttributeComponent* attributeComponent;
 
 
+
 public:
 	Entity();
 	virtual ~Entity();
 
+	sf::Sprite sprite;
 	//Component functions
 	void setTexture(sf::Texture& texture);
 	void createHitboxComponent(sf::Sprite& sprite,

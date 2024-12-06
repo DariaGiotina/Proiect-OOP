@@ -31,11 +31,12 @@ public:
 	int luck;
 
 	//Constructor / Destructor
-	AttributeComponent(unsigned level);
+	AttributeComponent(int exp);
 	virtual ~AttributeComponent();
 
 	//Functions
 	std::string debugPrint() const;
+
 
 	void gainExp(const unsigned exp);
 

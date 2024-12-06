@@ -3,7 +3,7 @@
 
 
 #include "Player.h"
-
+#include "Enemy.h"
 //abstract class to keep the resources of the game and the base for other states
 // like the main menu or game state
 #include "GraphicsSettings.h"
@@ -24,6 +24,8 @@ public:
 	GraphicsSettings* gfxSettings;
 	std::map<std::string, int>* supportedKeys;
 	std::stack<State*>* states;
+	//Player
+
 
 };
 class State
@@ -52,6 +54,8 @@ protected:
 
 	//Functions
 	virtual void initKeybinds() = 0;
+
+
 
 public:
 

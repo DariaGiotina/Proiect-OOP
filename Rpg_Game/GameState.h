@@ -23,12 +23,18 @@ private:
 	sf::RenderTexture renderTexture;
 	sf::Sprite renderSprite;
 
+	//Delay
+	bool canEnterEnemyState;
+	sf::Clock teleportCooldownClock;
+	const float teleportCooldown = 2.f;
+
 	sf::Font font;
 	PauseMenu *pmenu;
 
 	Player *player;
 	PlayerGUI* playerGUI;
 	TileMap* tileMap;
+	AttributeComponent* attributeComponent;
 
 	//Functions
 	void initDeferredRender();

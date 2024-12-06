@@ -19,6 +19,7 @@ private:
 
 	std::map<std::string, gui::Button*> buttons;
 
+
 	// Textures for buttons
 	sf::Texture idleTexture;
 	sf::Texture hoverTexture;

@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "AttributeComponent.h"
 
-AttributeComponent::AttributeComponent(unsigned level)
+AttributeComponent::AttributeComponent(int exp)
 {
-	this->level = level;
-	this->exp = 0;
+
+
+	this->exp = exp;
+	std::cout << "Exp: " << this->exp << "\n";
+	this->level = 1;
 	this->expNext = static_cast<unsigned>((50 / 3) * ((pow(this->level + 1, 3) - 6 * pow(this->level + 1, 2)) + (17 * (this->level + 1)) - 12));
 	this->attributePoints = 3;
 
@@ -14,7 +17,6 @@ AttributeComponent::AttributeComponent(unsigned level)
 	this->wisdom = 1;
 	this->intelligence = 1;
 	this->charisma = 1;
-
 
 	this->updateLevel();
 	this->updateStats(true);
@@ -39,10 +41,11 @@ std::string AttributeComponent::debugPrint() const
 	return ss.str();
 }
 
-void AttributeComponent::gainExp(const unsigned exp)
-{
-	this->exp += exp;
 
+void AttributeComponent::gainExp(const unsigned GainedExp)
+{
+	std::cout << "Gained Exp: " << GainedExp << "\n";
+	this->exp += GainedExp; // Add the gained EXP
 	this->updateLevel();
 }
 
@@ -69,6 +72,8 @@ void AttributeComponent::updateLevel()
 		this->exp -= this->expNext;
 		this->expNext = static_cast<unsigned>((50 / 3) * ((pow(this->level, 3) - 6 * pow(this->level, 2)) + (17 * this->level) - 12));
 		this->attributePoints++;
+		this->hpMax += 2;
+		std::cout << "Level Up! "<< level << "\n";
 	}
 }
 

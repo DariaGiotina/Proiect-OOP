@@ -6,6 +6,7 @@ void Entity::initVariables()
 	this->hitboxComponent = NULL;
 	this->movementComponent = NULL;
 	this->animationComponent = NULL;
+	this->attributeComponent = NULL;
 }
 
 Entity::Entity()
@@ -16,10 +17,26 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-	delete this->hitboxComponent;
-	delete this->movementComponent;
-	delete this->animationComponent;
-	delete this->attributeComponent;
+	if (this->hitboxComponent)
+	{
+		delete this->hitboxComponent;
+		this->hitboxComponent = nullptr;
+	}
+	if (this->movementComponent)
+	{
+		delete this->movementComponent;
+		this->movementComponent = nullptr;
+	}
+	if (this->animationComponent)
+	{
+		delete this->animationComponent;
+		this->animationComponent = nullptr;
+	}
+	if (this->attributeComponent)
+	{
+		delete this->attributeComponent;
+		this->attributeComponent = nullptr;
+	}
 
 }
 
@@ -91,7 +108,13 @@ void Entity::render(sf::RenderTarget& target)
 {
 		target.draw(this->sprite);
 
-		if(this->hitboxComponent)
+		if (this->hitboxComponent)
+		{
 			this->hitboxComponent->render(target);
-
+		}
+		else
+		{
+			// Log a warning message indicating that hitboxComponent is NULL
+			std::cerr << "Warning: hitboxComponent is NULL in Entity::render(). Ensure createHitboxComponent() is called before rendering." << std::endl;
+		}
 }

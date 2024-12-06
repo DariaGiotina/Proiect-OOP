@@ -2,9 +2,12 @@
 #include "State.h"
 
 
+
 //Constructor / Destructor
 State::State(StateData* state_data)
+	: stateData(state_data)
 {
+
 	this->stateData = state_data;
 	this->window = state_data->window;
 	this->supportedKeys = state_data->supportedKeys;
@@ -14,10 +17,12 @@ State::State(StateData* state_data)
 	this->keyTime = 0.f;
 	this->keyTimeMax = 10.f;
 	this->gridSize = state_data->gridSize;
+
 }
 
 State::~State()
 {
+	
 }
 
 //Accessors

@@ -9,6 +9,11 @@ class Player :
 {
 private:
 	//Variables
+	bool attacking;
+	sf::Clock attackTimer;
+	float attackDuration;
+	int animationnumber;
+	int exp;
 	// 
 	//Initializer functions
 	void initVariables();
@@ -26,6 +31,7 @@ public:
 	void loseHP(const int hp);
 	void gainHP(const int hp);
 	void gainExp(const unsigned exp);
+	void startAttackAnimation(const float& dt, int animationnumber);
 	virtual void updateAnimation(const float& dt);
 	void update(const float& dt);
 	void render(sf::RenderTarget& target);

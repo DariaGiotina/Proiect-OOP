@@ -7,6 +7,7 @@ void Game::initVariables()
 	this->dt = 0.f;
 	this->dtClock.restart();
 	this->gridSize = 100.f;
+
 }
 
 void Game::initGraphicsSettings()
@@ -71,10 +72,10 @@ void Game::initStateData()
 	this->stateData.gridSize = this->gridSize;
 }
 
+
 void Game::initStates()
 {
    this->states.push(new MainMenuState(&this->stateData));
-
 
    //this->states.push(new GameState(this->window, &this->supportedKeys)); //pushes a new game state object to the top of the stack
 }
@@ -93,6 +94,7 @@ Game::Game()
 Game::~Game()
 {
    delete this->window;
+ 
 
    while (!this->states.empty())
    {

@@ -69,8 +69,8 @@ void GameState::initPauseMenu()
 void GameState::initPlayers()
 {
 	this->player = new Player(0, 0, this->textures["PLAYER_SHEET"]);
-	this->player->setScale(2.f, 2.f); 
 }
+
 
 void GameState::initPlayerGUI()
 {
@@ -98,6 +98,8 @@ this->initPauseMenu();
 this->initPlayers();
 this->initPlayerGUI();
 this->initTileMap();
+
+this->canEnterEnemyState = true;
 }
 
 GameState::~GameState()
@@ -151,15 +153,41 @@ void GameState::updatePlayerGUI(const float& dt)
 	this->playerGUI->update(dt);
 }
 
+
 void GameState::getToEnemyState(const float& dt)
 {
-	sf::Vector2f playerPosition = this->player->getPosition();
-	sf::Vector2f targetPosition(2150.f,1110.f); // Example target position
-
-	if (playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
+	if (!this->canEnterEnemyState)
 	{
-		this->stateData->states->push(new EnemyState(this->stateData));
+		if (this->teleportCooldownClock.getElapsedTime().asSeconds() >= this->teleportCooldown)
+		{
+			this->canEnterEnemyState = true; // Enable teleportation
+			std::cout << "Cooldown ended, teleport enabled.\n";
+			std::cout << "GameState Player EXP: " << player->getAttributeComponent()->exp << "\n";
+		}
+		return; // Prevent execution if cooldown is still active
 	}
+
+	sf::Vector2f playerPosition = this->player->getPosition();
+	sf::Vector2f targetPosition(2150.f, 1110.f); // Target zone for EnemyState
+
+	// Check if the player is outside and re-enters the zone
+	static bool playerExitedZone = false;
+
+	if (playerPosition.x < targetPosition.x - 50.f || playerPosition.y < targetPosition.y - 50.f)
+	{
+		playerExitedZone = true; // Mark the player as having exited the zone
+	}
+
+	if (playerExitedZone &&
+		playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
+	{
+		std::cout << "Entering EnemyState!\n";
+		this->stateData->states->push(new EnemyState(this->stateData));
+		this->canEnterEnemyState = false;
+		this->teleportCooldownClock.restart();
+		playerExitedZone = false; // Reset the zone exit flag
+	}
+
 }
 
 

@@ -151,6 +151,7 @@ void MainMenuState::updateButtons()
 	//New Game
 	if (this->buttons["GAME_STATE"]->isPressed())
 	{
+		std::cout << "New Game" << "\n";
 		this->states->push(new GameState(this->stateData));
 	}
 	//Settings 

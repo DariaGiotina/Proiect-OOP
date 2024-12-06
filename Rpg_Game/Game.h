@@ -9,8 +9,6 @@
 
 #include "MainMenuState.h"
 
-
-
 class Game
 {
 
@@ -23,6 +21,8 @@ public:
 
 	//Regular
 	void endApplication();
+	//Objects
+
 
 	//Update
 	void updateDT();
@@ -42,6 +42,7 @@ private:
 	StateData stateData;
 	sf::RenderWindow* window;
 	sf::Event ev;
+
 
 	sf::Clock dtClock;
 	float dt;
