@@ -57,9 +57,21 @@ void GameState::initTextures()
 	}
 	if (!this->textures["KLEE"].loadFromFile("assets/player/klee_texture.png"))
 	{
-		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_PLAYER_TEXTURE");
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_KLEE_TEXTURE");
 	}
 
+	if (!this->textures["ADVENTURE_HOUSE"].loadFromFile("assets/The_Fan-tasy_Tileset/Art/Buildings/House_Hay_Stone_1.png"))
+	{
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_ADVENTURE_HOUSE_TEXTURE");
+	}
+	if (!this->textures["BLACKSMITH_HOUSE"].loadFromFile("assets/The_Fan-tasy_Tileset/Art/Buildings/House_Hay_Stone_3.png"))
+	{
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_BLACKSMITH_HOUSE_TEXTURE");
+	}
+	if (!this->textures["MARKET_HOUSE"].loadFromFile("assets/The_Fan-tasy_Tileset/Art/Buildings/House_Hay_Stone_4.png"))
+	{
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_MARKET_HOUSE_TEXTURE");
+	}
 }
 
 void GameState::initPauseMenu()
@@ -73,7 +85,8 @@ void GameState::initPauseMenu()
 
 void GameState::initPlayers()
 {
-	this->player = new Player(100.f, 100.f, this->textures["PLAYER_SHEET"]);
+	this->player->setPosition(100.f, 100.f);
+	this->player->setScale(2.f, 2.f);
 }
 
 
@@ -95,10 +108,25 @@ void GameState::initTileMap()
 	this->tileMap->loadFromFile("test.rpg");
 }
 
+void GameState::initHouse()
+{
+	this->AdventureHouse.setSize(sf::Vector2f(400.f, 400.f));
+	this->AdventureHouse.setTexture(&this->textures["ADVENTURE_HOUSE"]);
+	this->AdventureHouse.setPosition(1000.f, -100.f);
+
+	this->BlacksmithHouse.setSize(sf::Vector2f(400.f, 400.f));
+	this->BlacksmithHouse.setTexture(&this->textures["BLACKSMITH_HOUSE"]);
+	this->BlacksmithHouse.setPosition(400.f, 700.f);
+
+	this->MarketHouse.setSize(sf::Vector2f(400.f, 400.f));
+	this->MarketHouse.setTexture(&this->textures["MARKET_HOUSE"]);
+	this->MarketHouse.setPosition(1400.f, 700.f);
+}
+
 
 //Constructor / Destructor
-GameState::GameState(StateData* state_data)
-	: State(state_data)
+GameState::GameState(StateData* state_data, Player* player)
+	: State(state_data), player(player)
 {
 this->initDeferredRender();
 this->initView();
@@ -111,6 +139,7 @@ this->initPlayers();
 this->initPlayerGUI();
 this->initNpc();
 this->initTileMap();
+this->initHouse();
 
 this->canEnterEnemyState = true;
 }
@@ -118,7 +147,6 @@ this->canEnterEnemyState = true;
 GameState::~GameState()
 {
 	delete this->pmenu;
-	delete this->player;
 	delete this->tileMap;
 	delete this->playerGUI;
 }
@@ -201,7 +229,6 @@ void GameState::getToEnemyState(const float& dt)
 		{
 			this->canEnterEnemyState = true; // Enable teleportation
 			std::cout << "Cooldown ended, teleport enabled.\n";
-			std::cout << "GameState Player EXP: " << player->getAttributeComponent()->exp << "\n";
 		}
 		return; // Prevent execution if cooldown is still active
 	}
@@ -221,7 +248,7 @@ void GameState::getToEnemyState(const float& dt)
 		playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
 	{
 		std::cout << "Entering EnemyState!\n";
-		this->stateData->states->push(new EnemyState(this->stateData));
+		this->stateData->states->push(new EnemyState(this->stateData,this->player));
 		this->canEnterEnemyState = false;
 		this->teleportCooldownClock.restart();
 		playerExitedZone = false; // Reset the zone exit flag
@@ -273,6 +300,13 @@ void GameState::update(const float& dt)
 
 }
 
+void GameState::renderHouses(sf::RenderTarget& target)
+{
+	target.draw(this->AdventureHouse);
+	target.draw(this->BlacksmithHouse);
+	target.draw(this->MarketHouse);
+}
+
 void GameState::render(sf::RenderTarget* target)
 {
 if (!target)
@@ -283,6 +317,10 @@ this->renderTexture.clear();
 
 this->renderTexture.setView(this->view);
 this->tileMap->render(this->renderTexture);
+
+//Render Houses
+this->renderHouses(this->renderTexture);
+
 //Render NPC
 this->npc->renderNpc(this->renderTexture);
 

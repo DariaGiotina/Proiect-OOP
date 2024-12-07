@@ -10,13 +10,6 @@ void Player::initVariables()
 
 void Player::initComponents()
 {
-	std::ifstream ifs("Config/PlayerAttributes.ini");
-	if (ifs.is_open())
-	{
-		ifs >> exp;
-		this->exp = exp;
-	}
-	ifs.close();
 
 }
 
@@ -35,11 +28,12 @@ Player::Player(float x,float y,sf::Texture& texture_sheet) : attacking(false)
 	this->createAttributeComponent(exp);
 	
 	this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 3, 0, 100, 70);
-	this->animationComponent->addAnimation("WALK", 7.f, 0, 1, 6, 1, 100, 70);
+	this->animationComponent->addAnimation("WALKRIGHT", 7.f, 0, 1, 6, 1, 100, 70);
 	this->animationComponent->addAnimation("ATTACK", 5.f, 0, 2, 5, 2, 100, 70);
 	this->animationComponent->addAnimation("ATTACK2", 6.f, 0, 3, 5, 3, 100, 70);
 	this->animationComponent->addAnimation("ATTACK3", 4.f, 0, 4, 8, 4, 100, 70);
 	this->animationComponent->addAnimation("ATTACK4", 8.f, 0, 5, 4, 5, 100, 70);
+	this->animationComponent->addAnimation("WALKLEFT", 7.f, 0, 6, 6, 6, 100, 70);
 }
 
 Player::~Player()
@@ -121,37 +115,37 @@ void Player::updateAnimation(const float& dt)
 			this->attacking = false; // Reset attacking state
 		}
 	}
-	else if (this->movementComponent->getState(IDLE))
-	{
-		this->animationComponent->play("IDLE", dt);
-	}
-	else if (this->movementComponent->getState(MOVING_RIGHT))
-	{
-		this->sprite.setOrigin(0.f, 0.f);
-		this->sprite.setScale(2.f, 2.f);
-		this->animationComponent->play("WALK", dt,this->movementComponent->getVelocity().x,this->movementComponent->getMaxVelocity());
-	}
-	else if (this->movementComponent -> getState(MOVING_LEFT))
-	{
-		this->sprite.setOrigin(100.f, 0.f);
-		this->sprite.setScale(-2.f, 2.f);
-		this ->animationComponent->play("WALK", dt, this->movementComponent->getVelocity().x, this->movementComponent->getMaxVelocity());
-	}
-	else if (this->movementComponent->getState(MOVING_UP))
-	{
-		this->animationComponent->play("WALK", dt,this->movementComponent->getVelocity().y, this->movementComponent->getMaxVelocity());
-	}
-	else if (this->movementComponent->getState(MOVING_DOWN))
-	{
-		this->animationComponent->play("WALK", dt,this->movementComponent->getVelocity().y, this->movementComponent->getMaxVelocity());
-	}
 
-	else
-	{
-		this->animationComponent->play("IDLE", dt);
-	}
-	this->hitboxComponent->update();
+	
+		else if (this->movementComponent->getState(IDLE))
+		{
+			this->animationComponent->play("IDLE", dt);
+		}
+		else if (this->movementComponent->getState(MOVING_RIGHT))
+		{
+		
+			this->animationComponent->play("WALKRIGHT", dt, this->movementComponent->getVelocity().x, this->movementComponent->getMaxVelocity());
+		}
+		else if (this->movementComponent->getState(MOVING_LEFT))
+		{
+		
+			this->animationComponent->play("WALKLEFT", dt, this->movementComponent->getVelocity().x, this->movementComponent->getMaxVelocity());
+		}
+		else if (this->movementComponent->getState(MOVING_UP))
+		{
+			this->animationComponent->play("WALKRIGHT", dt, this->movementComponent->getVelocity().y, this->movementComponent->getMaxVelocity());
+		}
+		else if (this->movementComponent->getState(MOVING_DOWN))
+		{
+			this->animationComponent->play("WALKRIGHT", dt, this->movementComponent->getVelocity().y, this->movementComponent->getMaxVelocity());
+		}
 
+		else
+		{
+			this->animationComponent->play("IDLE", dt);
+		}
+		this->hitboxComponent->update();
+	
 }
 
 void Player::update(const float& dt)

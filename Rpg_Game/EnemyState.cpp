@@ -124,7 +124,6 @@ void EnemyState::initKeybinds()
 
 void EnemyState::initPlayer()
 {
-	this->player = new Player(100.f, 550.f, this->textures["PLAYER_SHEET"]);
 	this->player->setPosition(100.f, 550.f);
 	this->player->setScale(5.f, 5.f);
 }
@@ -205,22 +204,11 @@ void EnemyState::initTurnText()
 	this->updateTurnText();
 }
 
-void EnemyState::initExp()
-{
-	std::ifstream ifs("Config/PlayerAttributes.ini");
-	if (ifs.is_open())
-	{
-		ifs >> exp;
-		this->exp = exp;
-	}
-	ifs.close();
 
-	this->attributeComponent = new AttributeComponent(exp);
-}
-
-EnemyState::EnemyState(StateData* state_data)
-	: State(state_data)
+EnemyState::EnemyState(StateData* state_data,Player* player)
+	: State(state_data), player(player)
 {
+
 	this->initDeferredRender();
 	this->initVariables();
 	this->initBackground();
@@ -233,13 +221,12 @@ EnemyState::EnemyState(StateData* state_data)
 	this->initPlayerGui();
 	this->initEnemyHPBar();
 	this->initTurnText();
-	this->initExp();
+
 
 }
 
 EnemyState::~EnemyState()
 {
-	delete this->player;
 	delete this->enemy;
 	auto it = this->buttons.begin();
 	for (it = this->buttons.begin(); it != this->buttons.end(); ++it)
@@ -278,7 +265,8 @@ void EnemyState::exitEnemyState(const float& dt)
 		if (this->messageTimer.getElapsedTime().asSeconds() >= this->messageDuration)
 		{
 			this->endState();  // Exit the state after the message duration is up
-
+			this->player->setScale(2.f, 2.f); 
+			this->player->setPosition(2100.f, 1110.f);
 		}
 	}
 }
@@ -318,8 +306,7 @@ void EnemyState::updateGame(const float& dt)
 		else
 		{
 			this->winnerText.setString("Player Won!");
-			player->gainExp(100); // Add EXP
-			std::cout << "EnemyState Player EXP: " << player->getAttributeComponent()->exp << "\n";
+			this->player->gainExp(100); // Add EXP
 
 		}
 
@@ -421,18 +408,6 @@ void EnemyState::updateTurnText()
 	else
 		this->turnText.setString("Enemy's Turn");
 }
-
-void EnemyState::updateExp(int exp)
-{
-	std::ofstream ofs("Config/PlayerAttributes.ini");
-	if (ofs.is_open())
-	{
-		ofs << exp;
-	}
-	ofs.close();
-
-}
-
 
 
 void EnemyState::update(const float& dt)

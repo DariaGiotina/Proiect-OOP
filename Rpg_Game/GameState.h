@@ -38,6 +38,14 @@ private:
 	TileMap* tileMap;
 	AttributeComponent* attributeComponent;
 
+
+	//House
+	sf::RectangleShape AdventureHouse;
+	sf::RectangleShape BlacksmithHouse;
+	sf::RectangleShape MarketHouse;
+
+	std::map<std::string, sf::Texture> houseTextures;
+
 	//Functions
 	void initDeferredRender();
 	void initView();
@@ -49,9 +57,10 @@ private:
 	void initPlayerGUI();
 	void initNpc();
 	void initTileMap();
+	void initHouse();
 
 public:
-		GameState(StateData* state_data);
+		GameState(StateData* state_data, Player* player);
 		virtual ~GameState();
 
 
@@ -63,6 +72,7 @@ public:
 		void getToEnemyState(const float& dt);
 		void updatePauseMenuButtons();
 		void update(const float& dt);
+		void renderHouses(sf::RenderTarget& target);
 		void render(sf::RenderTarget* target = nullptr);
 };
 #endif 

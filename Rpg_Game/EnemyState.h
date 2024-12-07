@@ -77,9 +77,8 @@ private:
 	void initPlayerGui();
 	void initEnemyHPBar();
 	void initTurnText();	
-	void initExp();
 public:
-	EnemyState(StateData* state_data);
+	EnemyState(StateData* state_data, Player* player);
 	virtual ~EnemyState();
 
 	const bool isButtonPressed(const std::string key);
@@ -93,7 +92,6 @@ public:
 	void updatePlayerGUI(const float& dt);
 	void updateEnemyHPBar();
 	void updateTurnText();
-	void updateExp(int exp);
 	void update(const float& dt);
 	void renderButtons(sf::RenderTarget& target);
 	void renderEnemyHPBar(sf::RenderTarget& target);

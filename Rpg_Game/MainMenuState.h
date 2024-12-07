@@ -16,6 +16,7 @@ private:
 	sf::RectangleShape background;
 	sf::Texture backgroundTexture;
 	sf::Font font;
+	Player* player;
 
 	std::map<std::string, gui::Button*> buttons;
 
@@ -38,7 +39,7 @@ private:
 	void initButtons();
 
 public:
-	MainMenuState(StateData* state_data);
+	MainMenuState(StateData* state_data, Player* player);
 	virtual ~MainMenuState();
 
 

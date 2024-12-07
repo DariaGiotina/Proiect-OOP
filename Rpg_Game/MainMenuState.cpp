@@ -108,8 +108,8 @@ void MainMenuState::initButtons()
 
 //Constructor / Destructor
 
-MainMenuState::MainMenuState(StateData* state_data)
-	: State(state_data)
+MainMenuState::MainMenuState(StateData* state_data,Player* player)
+	: State(state_data), player(player)
 {
 	this->initVariables();
 	this->initBackground();
@@ -152,7 +152,7 @@ void MainMenuState::updateButtons()
 	if (this->buttons["GAME_STATE"]->isPressed())
 	{
 		std::cout << "New Game" << "\n";
-		this->states->push(new GameState(this->stateData));
+		this->states->push(new GameState(this->stateData,this->player));
 	}
 	//Settings 
 	if (this->buttons["SETTINGS_STATE"]->isPressed())

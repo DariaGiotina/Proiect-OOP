@@ -31,7 +31,7 @@ public:
 	int luck;
 
 	//Constructor / Destructor
-	AttributeComponent(int exp);
+	AttributeComponent();
 	virtual ~AttributeComponent();
 
 	//Functions

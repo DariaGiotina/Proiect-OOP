@@ -1,6 +1,14 @@
 #include "stdafx.h"
 #include "Game.h"  
 
+void Game::initTextures()
+{
+    if (!this->textures["PLAYER_SHEET"].loadFromFile("assets/Knight_player/Idle+Walking_KG_1.png"))
+    {
+        throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_PLAYER_TEXTURE");
+    }
+}
+
 void Game::initVariables()
 {
 	this->window = nullptr;
@@ -8,6 +16,7 @@ void Game::initVariables()
 	this->dtClock.restart();
 	this->gridSize = 100.f;
 
+    this->player = new Player(0.f, 0.f,textures["PLAYER_SHEET"]);
 }
 
 void Game::initGraphicsSettings()
@@ -75,14 +84,14 @@ void Game::initStateData()
 
 void Game::initStates()
 {
-   this->states.push(new MainMenuState(&this->stateData));
+   this->states.push(new MainMenuState(&this->stateData,this->player));
 
-   //this->states.push(new GameState(this->window, &this->supportedKeys)); //pushes a new game state object to the top of the stack
 }
 
 // Constructors / Destructors
 Game::Game()
 {
+   this->initTextures();
    this->initVariables();
    this->initGraphicsSettings();
    this->initWindow();
@@ -101,6 +110,7 @@ Game::~Game()
        delete this->states.top();
        this->states.pop(); //while there are still states in the stack when we want to close the game we pop them until there are none left      
    }
+   delete this->player;
 }
 
 // Functions

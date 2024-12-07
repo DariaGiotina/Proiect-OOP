@@ -43,6 +43,7 @@ private:
 	sf::RenderWindow* window;
 	sf::Event ev;
 
+	Player* player;
 
 	sf::Clock dtClock;
 	float dt;
@@ -52,10 +53,12 @@ private:
 	//game the pause state will be stacked upon my game state and when i want to unpause it i pop it off the top 
 
 	std::map<std::string, int> supportedKeys; //map that holds the supported keys for the game
+	std::map<std::string, sf::Texture> textures;
 
 	float gridSize;
 
 	//Initializer Functions
+	void initTextures();
 	void initVariables();
 	void initGraphicsSettings();
 	void initWindow();
