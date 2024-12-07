@@ -7,6 +7,7 @@
 #include "TileMap.h"
 #include "PlayerGUI.h"
 #include "EnemyState.h"
+#include "Npc.h"
 
 class PauseMenu;
 class TileMap;
@@ -33,6 +34,7 @@ private:
 
 	Player *player;
 	PlayerGUI* playerGUI;
+	Npc* npc;
 	TileMap* tileMap;
 	AttributeComponent* attributeComponent;
 
@@ -45,6 +47,7 @@ private:
 	void initPauseMenu();
 	void initPlayers();
 	void initPlayerGUI();
+	void initNpc();
 	void initTileMap();
 
 public:
