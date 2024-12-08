@@ -53,16 +53,17 @@ void Npc::initDialogue(const std::string& text)
 
 }
 
-Npc::Npc(const sf::Texture& texture, const std::vector<std::string>& dialogueLines, sf::Vector2f position, const sf::RenderWindow& window)
-	: dialogue(dialogueLines), dialogueIndex(0), isTalking(false), window(window), questState(QuestState::NOT_TAKEN)
+Npc::Npc(const sf::Texture& texture, const std::map<QuestState, std::vector<std::string>>& dialogueMap, sf::Vector2f position, const sf::RenderWindow& window)
+	:dialogues(dialogueMap), dialogueIndex(0), isTalking(false), window(window), questState(QuestState::NOT_TAKEN)
 {
 
 	this->initTextures();
 	this->initFont();
 	this->initNpc(texture,position);
 
-	if (!dialogue.empty()) {
-		this->initDialogue(dialogue[0]); // Initialize with the first dialogue line
+
+	if (!dialogues.empty()) {
+		this->initDialogue(dialogues[questState][0]); // Initialize with the first dialogue line
 	}
 }
 
@@ -70,8 +71,25 @@ Npc::Npc(const sf::Texture& texture, const std::vector<std::string>& dialogueLin
 Npc::~Npc()
 {
 
+
+}
+void Npc::setQuestState(QuestState newState)
+{
+	if (questState != newState) {
+		questState = newState;
+		dialogueIndex = 0;  // Reset dialogue when changing the quest state
+		updateDialogueText();
+	}
+	else if (questState == QuestState::IN_PROGRESS) {
+		dialogueIndex = 0;
+
+	}
 }
 
+QuestState Npc::getQuestState() const
+{
+	return this->questState;
+}
 
 float Npc::getDistanceToNpc(const sf::Vector2f& playerPosition) const
 {
@@ -83,6 +101,33 @@ float Npc::getDistanceToNpc(const sf::Vector2f& playerPosition) const
 	return distance;
 }
 
+
+
+void Npc::updateDialogueText()
+{
+	if (dialogues.find(questState) != dialogues.end() && dialogues[questState].size() > dialogueIndex) {
+		dialogueText.setString(dialogues[questState][dialogueIndex]);
+	}
+	else {
+		dialogueText.setString("..."); // Handle end of dialogue or unhandled quest state
+	}
+
+}
+
+void Npc::nextDialogue() {
+	if (dialogues.find(questState) != dialogues.end() && dialogues[questState].size() > dialogueIndex) {
+		++dialogueIndex;
+		updateDialogueText();
+	}
+	else if(this->questState == QuestState::IN_PROGRESS || this->questState == QuestState::NOT_TAKEN) {
+		isTalking = false;  // End dialogue if no more text
+		this->setQuestState(QuestState::IN_PROGRESS);
+	}
+	else {
+		isTalking = false;
+	}
+}
+
 bool Npc::getIsTalking() const
 {
 	return this->isTalking;
@@ -91,40 +136,27 @@ bool Npc::getIsTalking() const
 void Npc::startTalking()
 {
 	isTalking = true;
-	dialogueIndex = 0;
 	updateDialogueText();
 }
 
-void Npc::nextDialogue() {
-	if (dialogueIndex < dialogue.size()) {
-		++dialogueIndex;
-		updateDialogueText();
-	}
-	else {
-		isTalking = false; // End of dialogue
-	}
-}
 
-void Npc::updateDialogueText()
+std::string Npc::toString(QuestState* currentQuest) const
 {
-	if (dialogueIndex < dialogue.size()) {
-		dialogueText.setString(dialogue[dialogueIndex]);
+	switch (questState)
+	{
+	case QuestState::NOT_TAKEN:
+		return "NOT_TAKEN";
+		break;
+	case QuestState::IN_PROGRESS:
+		return "IN_PROGRESS";
+		break;
+	case QuestState::COMPLETED:
+		return "COMPLETED";
+		break;
+	default:
+		return "UNKNOWN";
+		break;
 	}
-	else {
-		dialogueText.setString("");
-	}
-
-}
-
-void Npc::setQuestState(QuestState state)
-{
-	this->questState = state;
-
-}
-
-QuestState Npc::getQuestState() const
-{
-	return this->questState;
 }
 
 void Npc::renderNpc(sf::RenderTarget& target)

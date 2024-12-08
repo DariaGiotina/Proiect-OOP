@@ -6,19 +6,18 @@
 enum class QuestState {
 	NOT_TAKEN,
 	IN_PROGRESS,
-	COMPLETED,
-	NOQUEST
+	COMPLETED
 };
 
 class Npc
 {
 private:
-	QuestState questState;
+	
 
 	sf::Sprite sprite;
 	sf::RectangleShape DialogueBox;
 	sf::Texture dialogueBoxTexture;
-	std::vector<std::string> dialogue;
+	std::map<QuestState, std::vector<std::string>> dialogues;
 	size_t dialogueIndex;
 	bool isTalking;
 	sf::Text dialogueText;
@@ -35,19 +34,22 @@ private:
 	void initNpc(const sf::Texture& texture, sf::Vector2f position);
 	void initDialogue(const std::string& text);
 public:
-	Npc(const sf::Texture& texture, const std::vector<std::string>& dialogueLines, sf::Vector2f position, const sf::RenderWindow& window);
+	Npc(const sf::Texture& texture, const std::map<QuestState, std::vector<std::string>>& dialogueMap, sf::Vector2f position, const sf::RenderWindow& window);
 	virtual ~Npc();
 	
-	float getDistanceToNpc(const sf::Vector2f& playerPosition) const;
-	bool getIsTalking() const;
-
-	void startTalking();
-	void nextDialogue();
-	void updateDialogueText();
+	QuestState questState;
 
 	void setQuestState(QuestState state);
 	QuestState getQuestState() const;
 
+	float getDistanceToNpc(const sf::Vector2f& playerPosition) const;
+
+	void updateDialogueText();
+	void nextDialogue();
+	bool getIsTalking() const;
+	void startTalking();
+
+	std::string toString(QuestState* currentQuest) const;
 	void renderNpc(sf::RenderTarget& target);
 	void renderDialogue(sf::RenderTarget& target);
 	//void renderBoundingBox(sf::RenderTarget& target);

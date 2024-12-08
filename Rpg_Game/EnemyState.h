@@ -6,6 +6,7 @@
 #include "PlayerGUI.h"
 #include "Player.h"
 #include "AttributeComponent.h"
+#include "Npc.h"
 
 class EnemyState : public State
 {
@@ -32,6 +33,7 @@ private:
 	PlayerGUI* playerGUI;
 	AttributeComponent* attributeComponent;
 	AnimationComponent* animationComponent;
+	Npc* currentNpc;
 
 	//GUI
 	sf::RectangleShape background;
@@ -78,7 +80,7 @@ private:
 	void initEnemyHPBar();
 	void initTurnText();	
 public:
-	EnemyState(StateData* state_data, Player* player);
+	EnemyState(StateData* state_data, Player* player, Npc* currentNpc);
 	virtual ~EnemyState();
 
 	const bool isButtonPressed(const std::string key);

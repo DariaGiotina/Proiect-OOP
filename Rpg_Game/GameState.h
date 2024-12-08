@@ -29,6 +29,7 @@ private:
 	sf::Clock teleportCooldownClock;
 	const float teleportCooldown = 2.f;
 	bool isInventoryMenuOpen;
+	bool isCompleted;
 
 	sf::Font font;
 	sf::Font font2;
@@ -39,6 +40,8 @@ private:
 	Npc* npc;
 	TileMap* tileMap;
 	AttributeComponent* attributeComponent;
+	std::map<QuestState, std::vector<std::string>> npcDialogue;
+	QuestState* currentQuestState;
 
 
 	//House
@@ -89,6 +92,7 @@ public:
 		void updatePlayerInput(const float& dt);
 		void updatePlayerGUI(const float& dt);
 		void updateInventoryText(const float& dt);
+		void updateExpwhenComplete(const float& dt);
 		void getToEnemyState(const float& dt);
 		void updatePauseMenuButtons();
 		void update(const float& dt);

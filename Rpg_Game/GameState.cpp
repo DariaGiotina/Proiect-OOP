@@ -106,9 +106,32 @@ void GameState::initPlayerGUI()
 
 void GameState::initNpc()
 {
+	 this->npcDialogue = {
+		{QuestState::NOT_TAKEN, {
+			"Ah, another adventurer come to\nanswer the king's call.",
+			"You seek the bounty of the\ndragon, yes?",
+			"I see it in your eyes - you are\nmore than capable.",
+			"But be warned, the path to the\ndragon's lair is not for the faint\nof heart.",
+			"For now prove your strength to me\nand slay that evil shroom in the\nmonster forest.",
+			"If you manage to do that i will\nreward you and tell you more\nabout this kingdom."
+		}},
+		{QuestState::IN_PROGRESS, {
+			"The dragon's lair awaits,\nadventurer. Have you slain the\nevil shroom yet?",
+			"Hurry, time is of the essence.\nThe dragon will grow stronger.",
+			"I hope you have the courage to\nface what's ahead!"
+		}},
+		{QuestState::COMPLETED, {
+			"Ah, you've slain the shroom!\nThe kingdom thanks you.",
+			"Now, the road to the dragon's lair\nis clear. Go and claim your prize.",
+			"Remember, adventurer, the\nkingdom will forever be in your\ndebt."
+		}}
+	};
+
 	this->npc = new Npc(this->textures["KLEE"], 
-		{ "Ah, another adventurer come to \n answer the king's call.","You seek the bounty of the\ndragon, yes?","I see it in your eyes - you are\nmore than capable", "But be warned, the path to the\ndragon's lair is not for the faint\nof heart.", "For now prove your strength to me\nand slay that evil shroom in the\nmonster forest.","If you manage to do that i will\nreward you and tell you more\nabout this kingdom."},
+		npcDialogue,
 		sf::Vector2f(1000.f, 200.f), *this->window);
+
+	this->isCompleted = false;
 }
 
 void GameState::initTileMap()
@@ -194,6 +217,7 @@ void GameState::initInventoryText()
 }
 
 
+
 //Constructor / Destructor
 GameState::GameState(StateData* state_data, Player* player)
 	: State(state_data), player(player)
@@ -219,6 +243,8 @@ this->initInventoryText();
 this->canEnterEnemyState = true;
 this->isInventoryMenuOpen = false;
 
+
+
 }
 
 GameState::~GameState()
@@ -228,7 +254,7 @@ GameState::~GameState()
 	delete this->playerGUI;
 }
 
-//Functions
+//Functions 
 
 void GameState::updateView(const float& dt)
 {
@@ -249,6 +275,7 @@ void GameState::updateInput(const float& dt)
 				std::cout << "Player is close to NPC, starting dialogue..." << std::endl;
 				this->npc->startTalking();
 			}
+
 			else {
 				// If the NPC is talking, go to the next part of the dialogue
 				std::cout << "Advancing dialogue..." << std::endl;
@@ -315,6 +342,14 @@ void GameState::updateInventoryText(const float& dt)
 	this->inventoryTextlevel.setString(sf::String(std::to_string(this->player->getAttributeComponent()->level)));
 }
 
+void GameState::updateExpwhenComplete(const float& dt)
+{
+	if (this->npc->getQuestState() == QuestState::COMPLETED && this->npc->getIsTalking() && !isCompleted) {
+		this->player->gainExp(200);
+		this->isCompleted = true;
+	}
+}
+
 
 void GameState::getToEnemyState(const float& dt)
 {
@@ -342,8 +377,8 @@ void GameState::getToEnemyState(const float& dt)
 	if (playerExitedZone &&
 		playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
 	{
-		std::cout << "Entering EnemyState!\n";
-		this->stateData->states->push(new EnemyState(this->stateData,this->player));
+		std::cout << "Entering EnemyState!\n" << "QuestState: "<< this->npc->toString(currentQuestState) <<"\n";
+		this->stateData->states->push(new EnemyState(this->stateData,this->player,this->npc));
 		this->canEnterEnemyState = false;
 		this->teleportCooldownClock.restart();
 		playerExitedZone = false; // Reset the zone exit flag
@@ -387,6 +422,7 @@ void GameState::update(const float& dt)
 
 		this->updateInventoryText(dt);
 
+		this->updateExpwhenComplete(dt);
 	
     }
 	else //paused update

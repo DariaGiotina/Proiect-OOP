@@ -205,8 +205,9 @@ void EnemyState::initTurnText()
 }
 
 
-EnemyState::EnemyState(StateData* state_data,Player* player)
-	: State(state_data), player(player)
+
+EnemyState::EnemyState(StateData* state_data,Player* player,Npc* currentNpc)
+	: State(state_data), player(player), currentNpc(currentNpc)
 {
 
 	this->initDeferredRender();
@@ -221,7 +222,6 @@ EnemyState::EnemyState(StateData* state_data,Player* player)
 	this->initPlayerGui();
 	this->initEnemyHPBar();
 	this->initTurnText();
-
 
 }
 
@@ -283,7 +283,7 @@ bool EnemyState::updateDelayTimer(const float& dt)
 			this->delayTimer = 0.f;       // Reset timer
 			this->isDelayActive = false; // Deactivate delay
 			return true;
-		}
+		} 
 	}
 	return false;
 }
@@ -308,7 +308,10 @@ void EnemyState::updateGame(const float& dt)
 		{
 			this->winnerText.setString("Player Won!");
 			this->player->gainExp(100); // Add EXP
-
+	
+			if(this->currentNpc->getQuestState() == QuestState::IN_PROGRESS)
+				this->currentNpc->setQuestState(QuestState::COMPLETED); // Complete the quest
+		
 		}
 
 		// Start the message timer so the state knows to wait for a few seconds

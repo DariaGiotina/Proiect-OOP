@@ -65,10 +65,10 @@ void Game::initKeys()
    ifs.close();
 
 
-   for (auto i : this->supportedKeys)
-   {
-	   std::cout << i.first << " " << i.second << "\n";
-   }
+   //for (auto i : this->supportedKeys)
+   //{
+	  // std::cout << i.first << " " << i.second << "\n";
+   //}
    
 }
 
