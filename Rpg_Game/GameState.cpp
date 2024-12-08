@@ -47,7 +47,12 @@ void GameState::initFonts()
 	{
 		throw("ERROR::GAMESTATE::COULD NOT LOAD FONT"); //exits the program and shows the error message
 	}
+	if (!this->font2.loadFromFile("Fonts/Rundeck.ttf"))
+	{
+		throw("ERROR::GAMESTATE::COULD NOT LOAD FONT2"); //exits the program and shows the error message
+	}
 }
+
 
 void GameState::initTextures()
 {
@@ -71,6 +76,10 @@ void GameState::initTextures()
 	if (!this->textures["MARKET_HOUSE"].loadFromFile("assets/The_Fan-tasy_Tileset/Art/Buildings/House_Hay_Stone_4.png"))
 	{
 		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_MARKET_HOUSE_TEXTURE");
+	}
+	if (!this->inventoryMenuTexture.loadFromFile("assets/inventory/level.png"))
+	{
+		throw("ERROR::PLAYERGUI::COULD NOT LOAD INVENTORY TEXTURE");
 	}
 }
 
@@ -123,6 +132,67 @@ void GameState::initHouse()
 	this->MarketHouse.setPosition(1400.f, 700.f);
 }
 
+void GameState::initInventoryMenu()
+{
+	this->inventoryMenu.setSize(sf::Vector2f(1000.f, 1000.f));
+	this->inventoryMenu.setTexture(&this->inventoryMenuTexture);
+	this->inventoryMenu.setPosition(50.f, 50.f);
+}
+
+void GameState::initInventoryText()
+{
+	this->inventoryTexthealth.setFont(this->font2);
+	this->inventoryTexthealth.setCharacterSize(20);
+	this->inventoryTexthealth.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTexthealth.setPosition(580.f, 203.f);
+	this->inventoryTexthealth.setString(sf::String(std::to_string(this->player->getAttributeComponent()->hpMax)));
+
+	this->inventoryTextlevel.setFont(this->font2);
+	this->inventoryTextlevel.setCharacterSize(20);
+	this->inventoryTextlevel.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTextlevel.setPosition(360.f, 203.f);
+	this->inventoryTextlevel.setString(sf::String(std::to_string(this->player->getAttributeComponent()->level)));
+
+
+	this->inventoryTextstrength.setFont(this->font2);
+	this->inventoryTextstrength.setCharacterSize(20);
+	this->inventoryTextstrength.setFillColor(sf::Color(96,68,93,255));
+	this->inventoryTextstrength.setPosition(380.f, 747.f);
+	this->inventoryTextstrength.setString(sf::String(std::to_string(this->player->getAttributeComponent()->strength)));
+
+	this->inventoryTextconstitution.setFont(this->font2);
+	this->inventoryTextconstitution.setCharacterSize(20);
+	this->inventoryTextconstitution.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTextconstitution.setPosition(380.f, 790.f);
+	this->inventoryTextconstitution.setString(sf::String(std::to_string(this->player->getAttributeComponent()->constitution)));
+
+	this->inventoryTextdexterity.setFont(this->font2);
+	this->inventoryTextdexterity.setCharacterSize(20);
+	this->inventoryTextdexterity.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTextdexterity.setPosition(380.f, 830.f);
+	this->inventoryTextdexterity.setString(sf::String(std::to_string(this->player->getAttributeComponent()->dexterity)));
+
+	this->inventoryTextwisdom.setFont(this->font2);
+	this->inventoryTextwisdom.setCharacterSize(20);
+	this->inventoryTextwisdom.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTextwisdom.setPosition(600.f, 747.f);
+	this->inventoryTextwisdom.setString(sf::String(std::to_string(this->player->getAttributeComponent()->wisdom)));
+
+
+	this->inventoryTextintelligence.setFont(this->font2);
+	this->inventoryTextintelligence.setCharacterSize(20);
+	this->inventoryTextintelligence.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTextintelligence.setPosition(600.f, 790.f);
+	this->inventoryTextintelligence.setString(sf::String(std::to_string(this->player->getAttributeComponent()->intelligence)));
+
+	this->inventoryTextcharisma.setFont(this->font2);
+	this->inventoryTextcharisma.setCharacterSize(20);
+	this->inventoryTextcharisma.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTextcharisma.setPosition(600.f, 830.f);
+	this->inventoryTextcharisma.setString(sf::String(std::to_string(this->player->getAttributeComponent()->charisma)));
+
+}
+
 
 //Constructor / Destructor
 GameState::GameState(StateData* state_data, Player* player)
@@ -133,15 +203,22 @@ this->initView();
 this->initKeybinds();
 this->initFonts();
 this->initTextures();
+
 this->initPauseMenu();
 
 this->initPlayers();
 this->initPlayerGUI();
+
 this->initNpc();
 this->initTileMap();
 this->initHouse();
 
+this->initInventoryMenu();
+this->initInventoryText();
+
 this->canEnterEnemyState = true;
+this->isInventoryMenuOpen = false;
+
 }
 
 GameState::~GameState()
@@ -197,7 +274,13 @@ void GameState::updateInput(const float& dt)
 			this->unpauseState();
 		}
 	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("INVENTORY"))) && this->getKeyTime())
+	{
+		this->isInventoryMenuOpen = !this->isInventoryMenuOpen;
+	}
 }
+
 
 void GameState::updatePlayerInput(const float & dt)
 {
@@ -218,6 +301,18 @@ if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))
 void GameState::updatePlayerGUI(const float& dt)
 {
 	this->playerGUI->update(dt);
+}
+
+void GameState::updateInventoryText(const float& dt)
+{
+	this->inventoryTextstrength.setString(sf::String(std::to_string(this->player->getAttributeComponent()->strength)));
+	this->inventoryTextconstitution.setString(sf::String(std::to_string(this->player->getAttributeComponent()->constitution)));
+	this->inventoryTextdexterity.setString(sf::String(std::to_string(this->player->getAttributeComponent()->dexterity)));
+	this->inventoryTextwisdom.setString(sf::String(std::to_string(this->player->getAttributeComponent()->wisdom)));
+	this->inventoryTextintelligence.setString(sf::String(std::to_string(this->player->getAttributeComponent()->intelligence)));
+	this->inventoryTextcharisma.setString(sf::String(std::to_string(this->player->getAttributeComponent()->charisma)));
+	this->inventoryTexthealth.setString(sf::String(std::to_string(this->player->getAttributeComponent()->hpMax)));
+	this->inventoryTextlevel.setString(sf::String(std::to_string(this->player->getAttributeComponent()->level)));
 }
 
 
@@ -252,6 +347,7 @@ void GameState::getToEnemyState(const float& dt)
 		this->canEnterEnemyState = false;
 		this->teleportCooldownClock.restart();
 		playerExitedZone = false; // Reset the zone exit flag
+		this->updateInventoryText(dt);
 	}
 
 }
@@ -289,6 +385,8 @@ void GameState::update(const float& dt)
 
 		this->playerGUI->update(dt);
 
+		this->updateInventoryText(dt);
+
 	
     }
 	else //paused update
@@ -307,33 +405,53 @@ void GameState::renderHouses(sf::RenderTarget& target)
 	target.draw(this->MarketHouse);
 }
 
+void GameState::renderInventoryMenu(sf::RenderTarget& target)
+{
+	target.draw(this->inventoryMenu);
+
+	target.draw(this->inventoryTextlevel);
+	target.draw(this->inventoryTexthealth);
+	target.draw(this->inventoryTextstrength);
+	target.draw(this->inventoryTextconstitution);
+	target.draw(this->inventoryTextdexterity);
+	target.draw(this->inventoryTextwisdom);
+	target.draw(this->inventoryTextintelligence);
+	target.draw(this->inventoryTextcharisma);
+}
+
 void GameState::render(sf::RenderTarget* target)
 {
-if (!target)
+	if (!target)
+	{
+		target = this->window;
+	}
+	this->renderTexture.clear();
+
+	this->renderTexture.setView(this->view);
+	this->tileMap->render(this->renderTexture);
+
+	//Render Houses
+	this->renderHouses(this->renderTexture);
+
+	//Render NPC
+	this->npc->renderNpc(this->renderTexture);
+
+	//Render player
+	this->player->render(this->renderTexture);
+
+	// Reset the view to default for GUI rendering
+	this->renderTexture.setView(this->renderTexture.getDefaultView());
+
+	//Render GUI
+	this->playerGUI->render(this->renderTexture);
+
+	this->npc->renderDialogue(this->renderTexture);
+
+	//Render Inventory Menu
+	if (this->isInventoryMenuOpen)
 {
-	target = this->window;
+	this->renderInventoryMenu(this->renderTexture);
 }
-this->renderTexture.clear();
-
-this->renderTexture.setView(this->view);
-this->tileMap->render(this->renderTexture);
-
-//Render Houses
-this->renderHouses(this->renderTexture);
-
-//Render NPC
-this->npc->renderNpc(this->renderTexture);
-
-//Render player
-this->player->render(this->renderTexture);
-
-// Reset the view to default for GUI rendering
-this->renderTexture.setView(this->renderTexture.getDefaultView());
-
-//Render GUI
-this->playerGUI->render(this->renderTexture);
-
-this->npc->renderDialogue(this->renderTexture);
 
 if (this->paused) //paused menu render
 {

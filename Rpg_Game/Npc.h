@@ -3,9 +3,18 @@
 
 #include "Entity.h"
 
+enum class QuestState {
+	NOT_TAKEN,
+	IN_PROGRESS,
+	COMPLETED,
+	NOQUEST
+};
+
 class Npc
 {
 private:
+	QuestState questState;
+
 	sf::Sprite sprite;
 	sf::RectangleShape DialogueBox;
 	sf::Texture dialogueBoxTexture;
@@ -35,6 +44,9 @@ public:
 	void startTalking();
 	void nextDialogue();
 	void updateDialogueText();
+
+	void setQuestState(QuestState state);
+	QuestState getQuestState() const;
 
 	void renderNpc(sf::RenderTarget& target);
 	void renderDialogue(sf::RenderTarget& target);

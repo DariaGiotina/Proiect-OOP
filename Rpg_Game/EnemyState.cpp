@@ -267,6 +267,7 @@ void EnemyState::exitEnemyState(const float& dt)
 			this->endState();  // Exit the state after the message duration is up
 			this->player->setScale(2.f, 2.f); 
 			this->player->setPosition(2100.f, 1110.f);
+
 		}
 	}
 }

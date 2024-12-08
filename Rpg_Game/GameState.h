@@ -28,8 +28,10 @@ private:
 	bool canEnterEnemyState;
 	sf::Clock teleportCooldownClock;
 	const float teleportCooldown = 2.f;
+	bool isInventoryMenuOpen;
 
 	sf::Font font;
+	sf::Font font2;
 	PauseMenu *pmenu;
 
 	Player *player;
@@ -46,6 +48,21 @@ private:
 
 	std::map<std::string, sf::Texture> houseTextures;
 
+
+	//Inventory
+	sf::RectangleShape inventoryMenu;
+	sf::Texture inventoryMenuTexture;
+
+	sf::Text inventoryTextlevel;
+	sf::Text inventoryTexthealth;
+
+	sf::Text inventoryTextstrength;
+	sf::Text inventoryTextconstitution;
+	sf::Text inventoryTextdexterity;
+	sf::Text inventoryTextwisdom;
+	sf::Text inventoryTextintelligence;
+	sf::Text inventoryTextcharisma;
+
 	//Functions
 	void initDeferredRender();
 	void initView();
@@ -58,6 +75,8 @@ private:
 	void initNpc();
 	void initTileMap();
 	void initHouse();
+	void initInventoryMenu();
+	void initInventoryText();
 
 public:
 		GameState(StateData* state_data, Player* player);
@@ -69,10 +88,12 @@ public:
 		void updateInput(const float& dt);
 		void updatePlayerInput(const float& dt);
 		void updatePlayerGUI(const float& dt);
+		void updateInventoryText(const float& dt);
 		void getToEnemyState(const float& dt);
 		void updatePauseMenuButtons();
 		void update(const float& dt);
 		void renderHouses(sf::RenderTarget& target);
+		void renderInventoryMenu(sf::RenderTarget& target);
 		void render(sf::RenderTarget* target = nullptr);
 };
 #endif 

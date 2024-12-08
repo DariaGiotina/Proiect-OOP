@@ -54,7 +54,7 @@ void Npc::initDialogue(const std::string& text)
 }
 
 Npc::Npc(const sf::Texture& texture, const std::vector<std::string>& dialogueLines, sf::Vector2f position, const sf::RenderWindow& window)
-	: dialogue(dialogueLines), dialogueIndex(0), isTalking(false), window(window)
+	: dialogue(dialogueLines), dialogueIndex(0), isTalking(false), window(window), questState(QuestState::NOT_TAKEN)
 {
 
 	this->initTextures();
@@ -114,6 +114,17 @@ void Npc::updateDialogueText()
 		dialogueText.setString("");
 	}
 
+}
+
+void Npc::setQuestState(QuestState state)
+{
+	this->questState = state;
+
+}
+
+QuestState Npc::getQuestState() const
+{
+	return this->questState;
 }
 
 void Npc::renderNpc(sf::RenderTarget& target)
