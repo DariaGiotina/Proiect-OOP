@@ -5,10 +5,7 @@
 
 void Npc::initTextures()
 {
-	if (!this->dialogueBoxTexture.loadFromFile("assets/player/klee_text.png"))
-	{
-		throw("ERROR::PLAYERGUI::COULD NOT LOAD HP BAR BACK TEXTURE");
-	}
+
 }
 
 void Npc::initFont()
@@ -19,18 +16,19 @@ void Npc::initFont()
 	}
 }
 
-void Npc::initNpc(const sf::Texture& texture, sf::Vector2f position)
+void Npc::initNpc(const sf::Texture& texture, sf::Vector2f position, float x,float y)
 {
-	this->sprite.setTexture(texture);
-	this->sprite.setPosition(position);
+	this->NPC.setTexture(texture);
+	this->NPC.setPosition(position);
+	this->NPC.setScale(sprite_size_x, sprite_size_y);
 
-	this->sprite.setScale(0.3f, 0.3f);
+
 }
 
-void Npc::initDialogue(const std::string& text)
+void Npc::initDialogue(const std::string& text,const sf::Texture* dialogueTexture)
 {
-	DialogueBox.setTexture(&dialogueBoxTexture);
-	DialogueBox.setSize(sf::Vector2f(800.f, 250.f));
+	this->DialogueBox.setTexture(dialogueTexture);
+	this->DialogueBox.setSize(sf::Vector2f(800.f, 250.f));
 
 	// Get the window size
 	sf::Vector2u windowSize = window.getSize();
@@ -51,19 +49,34 @@ void Npc::initDialogue(const std::string& text)
 	dialogueText.setFillColor(sf::Color::Black);
 	dialogueText.setPosition(DialogueBox.getPosition().x + 320.f, DialogueBox.getPosition().y + 50.f);
 
+	
 }
 
-Npc::Npc(const sf::Texture& texture, const std::map<QuestState, std::vector<std::string>>& dialogueMap, sf::Vector2f position, const sf::RenderWindow& window)
-	:dialogues(dialogueMap), dialogueIndex(0), isTalking(false), window(window), questState(QuestState::NOT_TAKEN)
+void Npc::initQuestStateText()
+{
+	questStateText.setFont(this->font);
+	questStateText.setCharacterSize(25);
+	questStateText.setFillColor(sf::Color(80,18,63,255));
+	questStateText.setPosition(DialogueBox.getPosition().x + questPosX, DialogueBox.getPosition().y + questPosY);
+}
+
+Npc::Npc(const sf::Texture& texture,const sf::Texture& dialogueTexture,
+	const sf::String& questStateDescription, const sf::String& questStateDescriptionFinished,
+	const float& questPosX, const float& questPosY,
+	const std::map<QuestState,
+	std::vector<std::string>>& dialogueMap,
+	sf::Vector2f position, const sf::RenderWindow& window,float size_x, float size_y)
+	:dialogues(dialogueMap), dialogueIndex(0), isTalking(false), window(window), questState(QuestState::NOT_TAKEN), sprite_size_x(size_x), sprite_size_y(size_y), questStateDescription(questStateDescription),questStateDescriptionFinished(questStateDescriptionFinished), questPosX(questPosX), questPosY(questPosY)
 {
 
 	this->initTextures();
 	this->initFont();
-	this->initNpc(texture,position);
+	this->initNpc(texture,position, sprite_size_x, sprite_size_y);
+	this->initQuestStateText();
 
 
 	if (!dialogues.empty()) {
-		this->initDialogue(dialogues[questState][0]); // Initialize with the first dialogue line
+		this->initDialogue(dialogues[questState][0],&dialogueTexture); // Initialize with the first dialogue line
 	}
 }
 
@@ -91,15 +104,16 @@ QuestState Npc::getQuestState() const
 	return this->questState;
 }
 
-float Npc::getDistanceToNpc(const sf::Vector2f& playerPosition) const
+float Npc::getDistanceToKlee(const sf::Vector2f& playerPosition) const
 {
-	sf::Vector2f npcPosition = sprite.getPosition();
+	sf::Vector2f npcPosition = NPC.getPosition();
 
 	// Calculate the distance between the player and NPC
 	float distance = sqrt(pow(npcPosition.x - playerPosition.x, 2) + pow(npcPosition.y - playerPosition.y, 2));
 
 	return distance;
 }
+
 
 
 
@@ -110,6 +124,7 @@ void Npc::updateDialogueText()
 	}
 	else {
 		dialogueText.setString("..."); // Handle end of dialogue or unhandled quest state
+
 	}
 
 }
@@ -154,14 +169,14 @@ std::string Npc::toString(QuestState* currentQuest) const
 		return "COMPLETED";
 		break;
 	default:
-		return "UNKNOWN";
+		return "FINISHED";
 		break;
 	}
 }
 
 void Npc::renderNpc(sf::RenderTarget& target)
 {
-	target.draw(sprite);
+	target.draw(NPC);
 }
 
 void Npc::renderDialogue(sf::RenderTarget& target)
@@ -170,6 +185,25 @@ void Npc::renderDialogue(sf::RenderTarget& target)
 		target.draw(DialogueBox);
 		target.draw(dialogueText);
 		target.draw(nextText);
+	}
+
+	switch (questState)
+	{
+	case QuestState::NOT_TAKEN:
+		break;
+	case QuestState::IN_PROGRESS:
+		questStateText.setString(questStateDescription);
+		target.draw(questStateText);
+		break;
+	case QuestState::COMPLETED:
+		questStateText.setString(questStateDescriptionFinished); 
+		questStateText.setStyle(sf::Text::StrikeThrough);
+		target.draw(questStateText);
+		break;
+	case QuestState::FINISHED:
+		break;
+	default:
+		break;
 	}
 }
 

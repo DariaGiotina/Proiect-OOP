@@ -65,6 +65,22 @@ void GameState::initTextures()
 		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_KLEE_TEXTURE");
 	}
 
+	if (!this->textures["LISA"].loadFromFile("assets/player/lisa_texture.png"))
+	{
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_LISA_TEXTURE");
+	}
+
+	if (!this->textures["DIALOGUEBOX_KLEE"].loadFromFile("assets/player/klee_text.png"))
+	{
+		throw("ERROR::GAMESTATE::COULD NOT LOAD DIALOGUE BOX KLEE TEXTURE");
+	}
+
+	if (!this->textures["DIALOGUEBOX_LISA"].loadFromFile("assets/player/lisa_text.png"))
+	{
+		throw("ERROR::GAMESTATE::COULD NOT LOAD DIALOGUE BOX LISA TEXTURE");
+	}
+
+
 	if (!this->textures["ADVENTURE_HOUSE"].loadFromFile("assets/The_Fan-tasy_Tileset/Art/Buildings/House_Hay_Stone_1.png"))
 	{
 		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_ADVENTURE_HOUSE_TEXTURE");
@@ -77,10 +93,23 @@ void GameState::initTextures()
 	{
 		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_MARKET_HOUSE_TEXTURE");
 	}
+
+
+	if (!this->textures["ENCHANTED_FOREST"].loadFromFile("assets/The_Fan-tasy_Tileset/ToTheEnchantedForest.png"))
+	{
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_ENCHANTED_FOREST_TEXTURE");
+	}
+
+	if (!this->textures["MAGICAL_GARDEN"].loadFromFile("assets/The_Fan-tasy_Tileset/ToTheMagicalGarden.png"))
+	{
+		throw std::runtime_error("ERROR::GAME_STATE::COULD_NOT_LOAD_MAGICAL_GARDEN_TEXTURE");
+	}
+
 	if (!this->inventoryMenuTexture.loadFromFile("assets/inventory/level.png"))
 	{
 		throw("ERROR::PLAYERGUI::COULD NOT LOAD INVENTORY TEXTURE");
 	}
+
 }
 
 void GameState::initPauseMenu()
@@ -106,7 +135,7 @@ void GameState::initPlayerGUI()
 
 void GameState::initNpc()
 {
-	 this->npcDialogue = {
+	 this->npcDialogueKlee = {
 		{QuestState::NOT_TAKEN, {
 			"Ah, another adventurer come to\nanswer the king's call.",
 			"You seek the bounty of the\ndragon, yes?",
@@ -123,20 +152,59 @@ void GameState::initNpc()
 		{QuestState::COMPLETED, {
 			"Ah, you've slain the shroom!\nThe kingdom thanks you.",
 			"Now, the road to the dragon's lair\nis clear. Go and claim your prize.",
-			"Remember, adventurer, the\nkingdom will forever be in your\ndebt."
+			"Remember, adventurer, the\nkingdom will forever be in your\ndebt.",
+			"(You receive 200 exp)"
 		}}
 	};
 
-	this->npc = new Npc(this->textures["KLEE"], 
-		npcDialogue,
-		sf::Vector2f(1000.f, 200.f), *this->window);
+	 this->questStateDescriptionKlee = "Quest 1 : Prove your strength \n\n Go to the enchanted forest and kill \n one mushroom enemy";
+	 this->questStateDescriptionKleeFinished = "Quest 1 : Prove your strength \n\n Go to the enchanted forest and kill \n one mushroom enemy \n\n COMPLETED";
 
-	this->isCompleted = false;
+		 this->klee = new Npc(this->textures["KLEE"], this->textures["DIALOGUEBOX_KLEE"],
+			 questStateDescriptionKlee, questStateDescriptionKleeFinished,
+			 10.f, 300.f,
+			 npcDialogueKlee,
+			 sf::Vector2f(1000.f, 200.f), *this->window,
+			 0.125f, 0.125f);
+
+	this->isCompletedKlee = false;
+
+
+	this->npcDialogueLisa = {
+   {QuestState::NOT_TAKEN, {
+	  "So the rumers were true, there is\na new traveler in town",
+	  "I am Lisa, the kingdom's\nshopkeeper, but unfortunately\nmy cart was blocked ",
+	  "by a two-headed flower enemy\nin the magical garden",
+	  "If you can help me with\nthat, I will reward you plenty",
+   }},
+   {QuestState::IN_PROGRESS, {
+	   "Have you slain the two-headed\nflower yet?",
+	   "Please hurry, I need to\nget my cart back to the kingdom."
+   }},
+   {QuestState::COMPLETED, {
+	   "You've done me a great service,\ntraveler.",
+	   "Please, take this as a token of\nmy gratitude.",
+	   "(You receive 200 exp)"
+   }}
+	};
+
+	this->questStateDescriptionLisa = "Quest 2 : Slain the 2 headed flower \n\n Go to the magical garden and kill \n one flower enemy";
+	this->questStateDescriptionLisaFinished = "Quest 2 : Slain the 2 headed flower \n\n Go to the magical garden and kill \n one flower enemy \n\n COMPLETED";
+
+	this->lisa = new Npc(this->textures["LISA"], this->textures["DIALOGUEBOX_LISA"],
+		questStateDescriptionLisa, questStateDescriptionLisaFinished,
+		10.f,500.f,
+		npcDialogueLisa,
+		sf::Vector2f(1300.f, 950.f), *this->window,
+		0.125f,0.125f);
+
+
+	this->isCompletedLisa = false;
 }
 
 void GameState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 100, 100, "assets/The_Fan-tasy_Tileset/Art/Ground_Tileset_100x100/4_textures.png");
+	this->tileMap = new TileMap(this->stateData->gridSize, 23, 16, "assets/The_Fan-tasy_Tileset/Art/Ground_Tileset_100x100/4_textures.png");
 	this->tileMap->loadFromFile("test.rpg");
 }
 
@@ -153,6 +221,14 @@ void GameState::initHouse()
 	this->MarketHouse.setSize(sf::Vector2f(400.f, 400.f));
 	this->MarketHouse.setTexture(&this->textures["MARKET_HOUSE"]);
 	this->MarketHouse.setPosition(1400.f, 700.f);
+
+	this->EnchantedForest.setSize(sf::Vector2f(200.f, 200.f));
+	this->EnchantedForest.setTexture(&this->textures["ENCHANTED_FOREST"]);
+	this->EnchantedForest.setPosition(2050.f, 1020.f);
+
+	this->MagicalGarden.setSize(sf::Vector2f(200.f, 200.f));
+	this->MagicalGarden.setTexture(&this->textures["MAGICAL_GARDEN"]);
+	this->MagicalGarden.setPosition(2050.f, 410.f);
 }
 
 void GameState::initInventoryMenu()
@@ -160,6 +236,8 @@ void GameState::initInventoryMenu()
 	this->inventoryMenu.setSize(sf::Vector2f(1000.f, 1000.f));
 	this->inventoryMenu.setTexture(&this->inventoryMenuTexture);
 	this->inventoryMenu.setPosition(50.f, 50.f);
+
+	//this->inventory = new Inventory();
 }
 
 void GameState::initInventoryText()
@@ -258,7 +336,34 @@ GameState::~GameState()
 
 void GameState::updateView(const float& dt)
 {
-	this->view.setCenter(this->player->getPosition());
+	sf::Vector2f playerPosition = this->player->getPosition();
+
+	// Get the size of the view and the window
+	sf::Vector2f viewSize = this->view.getSize();
+	sf::Vector2f halfViewSize = viewSize / 2.0f;
+
+	// Calculate the maximum bounds for the view's center
+	float maxX = this->tileMap->getMaxSize().x * this->tileMap->getGridSize() - halfViewSize.x;
+	float maxY = this->tileMap->getMaxSize().y * this->tileMap->getGridSize() - halfViewSize.y;
+
+	float minX = halfViewSize.x;
+	float minY = halfViewSize.y;
+
+	// Clamp the view's center position
+	sf::Vector2f clampedCenter = playerPosition;
+
+	if (clampedCenter.x < minX)
+		clampedCenter.x = minX;
+	else if (clampedCenter.x > maxX)
+		clampedCenter.x = maxX;
+
+	if (clampedCenter.y < minY)
+		clampedCenter.y = minY;
+	else if (clampedCenter.y > maxY)
+		clampedCenter.y = maxY;
+
+	// Update the view's center
+	this->view.setCenter(clampedCenter);
 }
 
 void GameState::updateInput(const float& dt)
@@ -267,28 +372,56 @@ void GameState::updateInput(const float& dt)
 
 	const float interactionRange = 150.f;  // Adjust the range as needed
 
-	if (this->npc->getDistanceToNpc(playerPos) < interactionRange) {
+
+	///FOR KLEE!!
+	if (this->klee->getDistanceToKlee(playerPos) < interactionRange) {
 		// If the player presses the "E" key and the dialogue isn't finished
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && this->getKeyTime()) {
 			// If the NPC is not talking yet, start the dialogue
-			if (!this->npc->getIsTalking()) {
+			if (!this->klee->getIsTalking()) {
 				std::cout << "Player is close to NPC, starting dialogue..." << std::endl;
-				this->npc->startTalking();
+				this->klee->startTalking();
 			}
 
 			else {
 				// If the NPC is talking, go to the next part of the dialogue
 				std::cout << "Advancing dialogue..." << std::endl;
-				this->npc->nextDialogue();
+				this->klee->nextDialogue();
 			}
 		}
 	}
 
-	// Optionally, you can add a condition to stop the dialogue if the player moves far enough from the NPC
-	if (this->npc->getIsTalking() && this->npc->getDistanceToNpc(playerPos) >= interactionRange) {
+
+	if (this->klee->getIsTalking() && this->klee->getDistanceToKlee(playerPos) >= interactionRange) {
 		std::cout << "Player moved away from NPC, stopping dialogue..." << std::endl;
-		this->npc->nextDialogue(); // End the dialogue or continue it
+		this->klee->nextDialogue(); // End the dialogue or continue it
 	}
+
+
+	///FOR LISA!!
+	if (this->lisa->getDistanceToKlee(playerPos) < interactionRange) {
+		// If the player presses the "E" key and the dialogue isn't finished
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && this->getKeyTime()) {
+			// If the NPC is not talking yet, start the dialogue
+			if (!this->lisa->getIsTalking()) {
+				std::cout << "Player is close to NPC, starting dialogue..." << std::endl;
+				this->lisa->startTalking();
+			}
+
+			else {
+				// If the NPC is talking, go to the next part of the dialogue
+				std::cout << "Advancing dialogue..." << std::endl;
+				this->lisa->nextDialogue();
+			}
+		}
+	}
+
+
+	if (this->lisa->getIsTalking() && this->lisa->getDistanceToKlee(playerPos) >= interactionRange) {
+		std::cout << "Player moved away from NPC, stopping dialogue..." << std::endl;
+		this->lisa->nextDialogue(); // End the dialogue or continue it
+	}
+
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeyTime())
 	{
@@ -340,14 +473,24 @@ void GameState::updateInventoryText(const float& dt)
 	this->inventoryTextcharisma.setString(sf::String(std::to_string(this->player->getAttributeComponent()->charisma)));
 	this->inventoryTexthealth.setString(sf::String(std::to_string(this->player->getAttributeComponent()->hpMax)));
 	this->inventoryTextlevel.setString(sf::String(std::to_string(this->player->getAttributeComponent()->level)));
+
+
 }
 
 void GameState::updateExpwhenComplete(const float& dt)
 {
-	if (this->npc->getQuestState() == QuestState::COMPLETED && this->npc->getIsTalking() && !isCompleted) {
+	if (this->klee->getQuestState() == QuestState::COMPLETED && this->klee->getIsTalking() && !isCompletedKlee) {
 		this->player->gainExp(200);
-		this->isCompleted = true;
+		this->isCompletedKlee = true;
 	}
+
+
+	if (this->lisa->getQuestState() == QuestState::COMPLETED && this->lisa->getIsTalking() && !isCompletedLisa) {
+		this->player->gainExp(200);
+		this->isCompletedLisa = true;
+		//this->lisa->setQuestState(QuestState::FINISHED);
+	}
+
 }
 
 
@@ -366,6 +509,7 @@ void GameState::getToEnemyState(const float& dt)
 	sf::Vector2f playerPosition = this->player->getPosition();
 	sf::Vector2f targetPosition(2150.f, 1110.f); // Target zone for EnemyState
 
+	sf::Vector2f targetPosition2(2150.f, 510.f); // Target zone for EnemyState
 	// Check if the player is outside and re-enters the zone
 	static bool playerExitedZone = false;
 
@@ -377,8 +521,22 @@ void GameState::getToEnemyState(const float& dt)
 	if (playerExitedZone &&
 		playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
 	{
-		std::cout << "Entering EnemyState!\n" << "QuestState: "<< this->npc->toString(currentQuestState) <<"\n";
-		this->stateData->states->push(new EnemyState(this->stateData,this->player,this->npc));
+		std::cout << "Entering EnemyState!\n" << "QuestState for Klee: "<< this->klee->toString(currentQuestState) <<"\n";
+		std::cout << "Entering EnemyState!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
+		this->stateData->states->push(new EnemyState(this->stateData,this->player,this->klee,this->lisa));
+		this->canEnterEnemyState = false;
+		this->teleportCooldownClock.restart();
+		playerExitedZone = false; // Reset the zone exit flag
+		this->updateInventoryText(dt);
+	}
+
+	if (playerExitedZone &&
+		playerPosition.x >= targetPosition2.x && playerPosition.y >= targetPosition2.y &&
+		playerPosition.y <= targetPosition2.y + 50.f)
+	{
+		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Klee: " << this->klee->toString(currentQuestState) << "\n";
+		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
+		this->stateData->states->push(new EnemyStateMimic(this->stateData, this->player, this->klee, this->lisa));
 		this->canEnterEnemyState = false;
 		this->teleportCooldownClock.restart();
 		playerExitedZone = false; // Reset the zone exit flag
@@ -412,11 +570,12 @@ void GameState::update(const float& dt)
 
 	if (!this->paused) //unpaused update
 	{
-		this->updateView(dt);
 	
 		this->updatePlayerInput(dt);
 
 		this->player->update(dt);
+
+		this->updateView(dt);
 
 		this->playerGUI->update(dt);
 
@@ -439,6 +598,9 @@ void GameState::renderHouses(sf::RenderTarget& target)
 	target.draw(this->AdventureHouse);
 	target.draw(this->BlacksmithHouse);
 	target.draw(this->MarketHouse);
+
+	target.draw(this->EnchantedForest);
+	target.draw(this->MagicalGarden);
 }
 
 void GameState::renderInventoryMenu(sf::RenderTarget& target)
@@ -453,6 +615,9 @@ void GameState::renderInventoryMenu(sf::RenderTarget& target)
 	target.draw(this->inventoryTextwisdom);
 	target.draw(this->inventoryTextintelligence);
 	target.draw(this->inventoryTextcharisma);
+
+	/*this->inventory->renderInventory(target, *this->inventory, this->houseTextures["BLACKSMITH_HOUSE"], this->font);*/
+
 }
 
 void GameState::render(sf::RenderTarget* target)
@@ -470,7 +635,8 @@ void GameState::render(sf::RenderTarget* target)
 	this->renderHouses(this->renderTexture);
 
 	//Render NPC
-	this->npc->renderNpc(this->renderTexture);
+	this->klee->renderNpc(this->renderTexture);
+	this->lisa->renderNpc(this->renderTexture);
 
 	//Render player
 	this->player->render(this->renderTexture);
@@ -481,7 +647,8 @@ void GameState::render(sf::RenderTarget* target)
 	//Render GUI
 	this->playerGUI->render(this->renderTexture);
 
-	this->npc->renderDialogue(this->renderTexture);
+	this->klee->renderDialogue(this->renderTexture);
+	this->lisa->renderDialogue(this->renderTexture);
 
 	//Render Inventory Menu
 	if (this->isInventoryMenuOpen)

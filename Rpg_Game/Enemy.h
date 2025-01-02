@@ -13,7 +13,7 @@ private:
 	void initVariables();
 	void initComponents();
 public:
-	Enemy(float x, float y, sf::Texture& texture);
+	Enemy(float x, float y, sf::Texture& texture, int width, int height, int frames_x, int frames_x2);
 	virtual ~Enemy();
 
 	//variables

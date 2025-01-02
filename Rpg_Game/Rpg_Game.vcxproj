@@ -139,6 +139,7 @@
     <ClCompile Include="AttributeComponent.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyState.cpp" />
+    <ClCompile Include="EnemyStateMimic.cpp" />
     <ClCompile Include="GraphicsSettings.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="EditorState.cpp" />
@@ -146,6 +147,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="HitboxComponent.cpp" />
+    <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="MovementComponent.cpp" />
@@ -169,6 +171,7 @@
     <ClInclude Include="AttributeComponent.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyState.h" />
+    <ClInclude Include="EnemyStateMimic.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="Gui.h" />
     <ClInclude Include="EditorState.h" />
@@ -176,6 +179,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="HitboxComponent.h" />
+    <ClInclude Include="Inventory.h" />
     <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="Npc.h" />

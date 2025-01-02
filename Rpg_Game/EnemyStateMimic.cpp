@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "EnemyState.h"
+#include "EnemyStateMimic.h"
 
 
-void EnemyState::initDeferredRender()
+void EnemyStateMimic::initDeferredRender()
 {
 	this->renderTexture.create(this->stateData->gfxSettings->resolution.width,
 		this->stateData->gfxSettings->resolution.height);
@@ -13,7 +13,7 @@ void EnemyState::initDeferredRender()
 		this->stateData->gfxSettings->resolution.height));
 }
 
-void EnemyState::initVariables()
+void EnemyStateMimic::initVariables()
 {
 	this->turn = 1; // Player's turn initially
 	this->gameWon = false; // Game hasn't ended initially
@@ -30,13 +30,13 @@ void EnemyState::initVariables()
 		this->window->getSize().y / 2.f - 25.f
 	);
 
-	
+
 
 }
 
-void EnemyState::initBackground()
+void EnemyStateMimic::initBackground()
 {
-	if (!this->backgroundTexture.loadFromFile("assets/spells/background1.jpeg"))
+	if (!this->backgroundTexture.loadFromFile("assets/spells/background2.jpeg"))
 	{
 		throw "ERROR::ENEMYSTATE::FAILED TO LOAD BACKGROUND TEXTURE";
 	}
@@ -58,7 +58,7 @@ void EnemyState::initBackground()
 
 }
 
-void EnemyState::initFonts()
+void EnemyStateMimic::initFonts()
 {
 	if (!this->font.loadFromFile("Fonts/AncientModernTales-a7Po.ttf"))
 	{
@@ -66,13 +66,13 @@ void EnemyState::initFonts()
 	}
 }
 
-void EnemyState::initTextures()
+void EnemyStateMimic::initTextures()
 {
 	if (!this->textures["PLAYER_SHEET"].loadFromFile("assets/Knight_player/Idle+Walking_KG_1.png"))
 	{
 		throw std::runtime_error("ERROR::ENEMY_STATE::COULD_NOT_LOAD_PLAYER_TEXTURE");
 	}
-	if (!this->textures["ENEMY_SHEET"].loadFromFile("assets/Forest_Monsters_FREE/Mushroom/Mushroom_with_VFX/Mushroom-AllAnimations.png"))
+	if (!this->textures["ENEMY_SHEET"].loadFromFile("assets/Enemy2/Monster.png"))
 	{
 		throw std::runtime_error("ERROR::ENEMY_STATE::COULD_NOT_LOAD_ENEMY_TEXTURE");
 	}
@@ -89,7 +89,7 @@ void EnemyState::initTextures()
 		!this->activeTextures["IDK"].loadFromFile("assets/spells/spell3_pressed.png") ||
 		!this->idleTextures["STARS"].loadFromFile("assets/spells/spell4.png") ||
 		!this->hoverTextures["STARS"].loadFromFile("assets/spells/spell4_pressed.png") ||
-		!this->activeTextures["STARS"].loadFromFile("assets/spells/spell4_pressed.png") 
+		!this->activeTextures["STARS"].loadFromFile("assets/spells/spell4_pressed.png")
 		)
 	{
 		throw "ERROR::ENEMYSTATE::FAILED TO LOAD BUTTON TEXTURES";
@@ -106,7 +106,7 @@ void EnemyState::initTextures()
 
 }
 
-void EnemyState::initKeybinds()
+void EnemyStateMimic::initKeybinds()
 {
 	std::ifstream ifs("Config/enemystate_keybinds.ini");
 	if (ifs.is_open())
@@ -122,19 +122,19 @@ void EnemyState::initKeybinds()
 	ifs.close();
 }
 
-void EnemyState::initPlayer()
+void EnemyStateMimic::initPlayer()
 {
-	this->player->setPosition(100.f, 550.f);
+	this->player->setPosition(100.f, 630.f);
 	this->player->setScale(5.f, 5.f);
 }
 
-void EnemyState::initEnemy()
+void EnemyStateMimic::initEnemy()
 {
-	this->enemy = new Enemy(1300.f, 550.f, this->textures["ENEMY_SHEET"],80,64,6,9);
+	this->enemy = new Enemy(1250.f, 500.f, this->textures["ENEMY_SHEET"],96,96,3,5);
 	this->enemy->setScale(5.f, 5.f);
 }
 
-void EnemyState::initButtons()
+void EnemyStateMimic::initButtons()
 {
 
 	sf::Color newGameColor = sf::Color(0, 0, 0, 200);
@@ -162,12 +162,12 @@ void EnemyState::initButtons()
 
 }
 
-void EnemyState::initPlayerGui()
+void EnemyStateMimic::initPlayerGui()
 {
 	this->playerGUI = new PlayerGUI(this->player);
 }
 
-void EnemyState::initEnemyHPBar()
+void EnemyStateMimic::initEnemyHPBar()
 {
 	float width = 300.f;
 	float height = 200.f;
@@ -192,7 +192,7 @@ void EnemyState::initEnemyHPBar()
 
 }
 
-void EnemyState::initTurnText()
+void EnemyStateMimic::initTurnText()
 {
 	this->turnText.setFont(this->font);
 	this->turnText.setCharacterSize(50);
@@ -206,7 +206,7 @@ void EnemyState::initTurnText()
 
 
 
-EnemyState::EnemyState(StateData* state_data,Player* player,Npc* KleeNpc,Npc* LisaNpc)
+EnemyStateMimic::EnemyStateMimic(StateData* state_data, Player* player, Npc* KleeNpc, Npc* LisaNpc)
 	: State(state_data), player(player), KleeNpc(KleeNpc), LisaNpc(LisaNpc)
 {
 
@@ -225,7 +225,7 @@ EnemyState::EnemyState(StateData* state_data,Player* player,Npc* KleeNpc,Npc* Li
 
 }
 
-EnemyState::~EnemyState()
+EnemyStateMimic::~EnemyStateMimic()
 {
 	delete this->enemy;
 	auto it = this->buttons.begin();
@@ -235,7 +235,7 @@ EnemyState::~EnemyState()
 	}
 }
 
-const bool EnemyState::isButtonPressed(const std::string key)
+const bool EnemyStateMimic::isButtonPressed(const std::string key)
 {
 	return this->buttons[key]->isPressed();
 }
@@ -243,21 +243,21 @@ const bool EnemyState::isButtonPressed(const std::string key)
 
 
 
-void EnemyState::switchTurn()
+void EnemyStateMimic::switchTurn()
 {
 	this->turn = (this->turn == 1) ? 0 : 1;
 	this->updateTurnText();
 	std::cout << "Turn switched!" << std::endl;
 }
 
-void EnemyState::startDelay(const float duration)
+void EnemyStateMimic::startDelay(const float duration)
 {
 	this->delayTimer = duration;
 	this->delayDuration = 0.f;
 	this->isDelayActive = true;
 }
 
-void EnemyState::exitEnemyState(const float& dt)
+void EnemyStateMimic::exitEnemyState(const float& dt)
 { // If the game is won and the message hasn't been displayed for enough time, wait
 	if (this->isGameOver)
 	{
@@ -265,14 +265,14 @@ void EnemyState::exitEnemyState(const float& dt)
 		if (this->messageTimer.getElapsedTime().asSeconds() >= this->messageDuration)
 		{
 			this->endState();  // Exit the state after the message duration is up
-			this->player->setScale(2.f, 2.f); 
-			this->player->setPosition(2100.f, 1110.f);
+			this->player->setScale(2.f, 2.f);
+			this->player->setPosition(2100.f, 510.f);
 
 		}
 	}
 }
 
-bool EnemyState::updateDelayTimer(const float& dt)
+bool EnemyStateMimic::updateDelayTimer(const float& dt)
 {
 	if (this->isDelayActive)
 	{
@@ -283,12 +283,12 @@ bool EnemyState::updateDelayTimer(const float& dt)
 			this->delayTimer = 0.f;       // Reset timer
 			this->isDelayActive = false; // Deactivate delay
 			return true;
-		} 
+		}
 	}
 	return false;
 }
 
-void EnemyState::updateGame(const float& dt)
+void EnemyStateMimic::updateGame(const float& dt)
 {
 
 	if (this->isGameOver) return;
@@ -308,10 +308,10 @@ void EnemyState::updateGame(const float& dt)
 		{
 			this->winnerText.setString("Player Won!");
 			this->player->gainExp(100); // Add EXP
-	
-			if(this->KleeNpc->getQuestState() == QuestState::IN_PROGRESS)
-				this->KleeNpc->setQuestState(QuestState::COMPLETED); // Complete the quest
-		
+
+
+			if (this->LisaNpc->getQuestState() == QuestState::IN_PROGRESS)
+				this->LisaNpc->setQuestState(QuestState::COMPLETED); // Complete the quest
 		}
 
 		// Start the message timer so the state knows to wait for a few seconds
@@ -338,7 +338,7 @@ void EnemyState::updateGame(const float& dt)
 		if (this->buttons["MOON"]->isPressed() && this->isButtonPressed("MOON")) {
 			std::cout << "Moon button pressed!" << std::endl;
 
-			this->player->startAttackAnimation(dt,1);
+			this->player->startAttackAnimation(dt, 1);
 
 			this->enemy->loseHP(10);
 
@@ -374,24 +374,24 @@ void EnemyState::updateGame(const float& dt)
 	}
 	else if (!this->isGameOver) {
 		this->enemy->startAttackAnimation(dt);
-		this->player->getAttributeComponent()->hp -= 1;
+		this->player->getAttributeComponent()->hp -= 3;
 		this->startDelay(3.f);
 	}
 
 
 }
 
-void EnemyState::updateInput(const float& dt)
+void EnemyStateMimic::updateInput(const float& dt)
 {
 }
 
-void EnemyState::updatePlayerGUI(const float& dt)
+void EnemyStateMimic::updatePlayerGUI(const float& dt)
 {
 	this->playerGUI->update(dt);
 }
 
 
-void EnemyState::updateEnemyHPBar()
+void EnemyStateMimic::updateEnemyHPBar()
 {
 	float percent = static_cast<float>(this->enemy->hp) / static_cast<float>(this->enemy->hpMax);
 
@@ -405,7 +405,7 @@ void EnemyState::updateEnemyHPBar()
 	this->EnemyhpBarText.setString(this->EnemyhpBarString);
 }
 
-void EnemyState::updateTurnText()
+void EnemyStateMimic::updateTurnText()
 {
 	if (this->turn == 1)
 		this->turnText.setString("Your Turn");
@@ -414,7 +414,7 @@ void EnemyState::updateTurnText()
 }
 
 
-void EnemyState::update(const float& dt)
+void EnemyStateMimic::update(const float& dt)
 {
 	this->updateMousePositions();
 
@@ -424,8 +424,8 @@ void EnemyState::update(const float& dt)
 
 	if (this->isGameOver)
 	{
-		this->exitEnemyState(dt); 
-		return; 
+		this->exitEnemyState(dt);
+		return;
 	}
 
 	this->updateGame(dt);
@@ -436,7 +436,7 @@ void EnemyState::update(const float& dt)
 
 
 
-void EnemyState::renderButtons(sf::RenderTarget& target)
+void EnemyStateMimic::renderButtons(sf::RenderTarget& target)
 {
 	for (auto& it : this->buttons)
 	{
@@ -444,14 +444,14 @@ void EnemyState::renderButtons(sf::RenderTarget& target)
 	}
 }
 
-void EnemyState::renderEnemyHPBar(sf::RenderTarget& target)
+void EnemyStateMimic::renderEnemyHPBar(sf::RenderTarget& target)
 {
 	target.draw(this->EnemyhpBarBack);
 	target.draw(this->EnemyhpBarInner);
 	target.draw(this->EnemyhpBarText);
 }
 
-void EnemyState::render(sf::RenderTarget* target)
+void EnemyStateMimic::render(sf::RenderTarget* target)
 {
 	if (!target)
 	{

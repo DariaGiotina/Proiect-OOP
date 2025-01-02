@@ -7,7 +7,9 @@
 #include "TileMap.h"
 #include "PlayerGUI.h"
 #include "EnemyState.h"
+#include "EnemyStateMimic.h"
 #include "Npc.h"
+#include "Inventory.h"
 
 class PauseMenu;
 class TileMap;
@@ -29,7 +31,8 @@ private:
 	sf::Clock teleportCooldownClock;
 	const float teleportCooldown = 2.f;
 	bool isInventoryMenuOpen;
-	bool isCompleted;
+	bool isCompletedKlee;
+	bool isCompletedLisa;
 
 	sf::Font font;
 	sf::Font font2;
@@ -37,12 +40,17 @@ private:
 
 	Player *player;
 	PlayerGUI* playerGUI;
-	Npc* npc;
+	Npc* klee;
+	Npc* lisa;
 	TileMap* tileMap;
 	AttributeComponent* attributeComponent;
-	std::map<QuestState, std::vector<std::string>> npcDialogue;
+	std::map<QuestState, std::vector<std::string>> npcDialogueKlee;
+	std::map<QuestState, std::vector<std::string>> npcDialogueLisa;
 	QuestState* currentQuestState;
-
+	sf::String questStateDescriptionKlee;
+	sf::String questStateDescriptionLisa;
+	sf::String questStateDescriptionKleeFinished;
+	sf::String questStateDescriptionLisaFinished;
 
 	//House
 	sf::RectangleShape AdventureHouse;
@@ -50,6 +58,10 @@ private:
 	sf::RectangleShape MarketHouse;
 
 	std::map<std::string, sf::Texture> houseTextures;
+
+	//Signs
+	sf::RectangleShape MagicalGarden;
+	sf::RectangleShape EnchantedForest;
 
 
 	//Inventory
@@ -65,6 +77,8 @@ private:
 	sf::Text inventoryTextwisdom;
 	sf::Text inventoryTextintelligence;
 	sf::Text inventoryTextcharisma;
+
+	Inventory* inventory;
 
 	//Functions
 	void initDeferredRender();

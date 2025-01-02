@@ -12,7 +12,7 @@ void Enemy::initComponents()
 {
 }
 
-Enemy::Enemy(float x, float y, sf::Texture& texture_sheet)
+Enemy::Enemy(float x, float y, sf::Texture& texture_sheet,int width, int height,int frames_x1,int frames_x2)
 {
 	this->initVariables();
 	this->initComponents();
@@ -21,8 +21,8 @@ Enemy::Enemy(float x, float y, sf::Texture& texture_sheet)
 	this->createAttributeComponent(1);
 
 	this->setPosition(x, y);
-	this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, 6, 0, 80, 64);
-	this->animationComponent->addAnimation("ATTACK", 10.f, 0, 1, 9, 1, 80, 64);
+	this->animationComponent->addAnimation("IDLE", 10.f, 0, 0, frames_x1, 0, width, height); //80 64
+	this->animationComponent->addAnimation("ATTACK", 10.f, 0, 1, frames_x2, 1, width, height);
 	//this->animationComponent->addAnimation("Hit", 10.f, 0, 2, 4, 2, 80, 64);
 }
 

@@ -1,5 +1,5 @@
-#ifndef ENEMYSTATE_H
-#define ENEMYSTATE_H
+#ifndef ENEMYSTATEMIMIC_H
+#define ENEMYSTATEMIMIC_H
 
 #include "State.h"
 #include "Gui.h"
@@ -8,7 +8,8 @@
 #include "AttributeComponent.h"
 #include "Npc.h"
 
-class EnemyState : public State
+class EnemyStateMimic :
+    public State
 {
 private:
 
@@ -22,7 +23,7 @@ private:
 
 	//Delay game over
 	bool gameWon;
-	bool isGameOver; 
+	bool isGameOver;
 	float messageDuration;    // Duration to display the message (5 seconds)
 	sf::Clock messageTimer;   // Timer for the message
 	sf::Text winnerText;
@@ -43,7 +44,7 @@ private:
 	sf::Text turnText;
 	sf::RectangleShape spellsbar;
 	sf::Texture spellsbarTexture;
-	
+
 	//Player
 	float exp;
 	float newExp;
@@ -60,7 +61,7 @@ private:
 	sf::RenderTexture renderTexture;
 	sf::Sprite renderSprite;
 
-	
+
 	//Buttons
 	std::map<std::string, gui::Button*> buttons;
 	std::map<std::string, sf::Texture> idleTextures;
@@ -79,10 +80,10 @@ private:
 	void initButtons();
 	void initPlayerGui();
 	void initEnemyHPBar();
-	void initTurnText();	
+	void initTurnText();
 public:
-	EnemyState(StateData* state_data, Player* player, Npc* KleeNpc,Npc* LisaNpc);
-	virtual ~EnemyState();
+	EnemyStateMimic(StateData* state_data, Player* player, Npc* KleeNpc, Npc* LisaNpc);
+	virtual ~EnemyStateMimic();
 
 	const bool isButtonPressed(const std::string key);
 
@@ -101,4 +102,4 @@ public:
 	void render(sf::RenderTarget* target = nullptr);
 };
 
-#endif // 
+#endif // !ENEMYSTATE_H

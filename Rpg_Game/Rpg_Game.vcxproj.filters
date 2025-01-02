@@ -31,6 +31,9 @@
     <Filter Include="Tile">
       <UniqueIdentifier>{237a9ce6-1267-4759-b7f0-d1e6c5313afb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Inventory">
+      <UniqueIdentifier>{1e938f1e-48b5-4ebe-8b8d-6b7e7ffaa65d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -102,6 +105,12 @@
     <ClCompile Include="Npc.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Inventory.cpp">
+      <Filter>Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyStateMimic.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -169,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="Npc.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Inventory.h">
+      <Filter>Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyStateMimic.h">
+      <Filter>States</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

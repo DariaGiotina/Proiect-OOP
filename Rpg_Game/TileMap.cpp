@@ -95,6 +95,16 @@ void TileMap::removeTile(const unsigned x, const unsigned y, const unsigned z)
 	}
 }
 
+sf::Vector2u TileMap::getMaxSize() const
+{
+	return this->maxSize;
+}
+
+float TileMap::getGridSize() const
+{
+	return this->gridSizeF;
+}
+
 //Functions
 void TileMap::saveToFile(const std::string file_name)
 {
