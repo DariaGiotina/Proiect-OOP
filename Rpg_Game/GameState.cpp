@@ -53,7 +53,6 @@ void GameState::initFonts()
 	}
 }
 
-
 void GameState::initTextures()
 {
 	if (!this->textures["PLAYER_SHEET"].loadFromFile("assets/Knight_player/Idle+Walking_KG_1.png"))
@@ -127,7 +126,6 @@ void GameState::initPlayers()
 	this->player->setScale(2.f, 2.f);
 }
 
-
 void GameState::initPlayerGUI()
 {
 	this->playerGUI = new PlayerGUI(this->player);
@@ -142,7 +140,8 @@ void GameState::initNpc()
 			"I see it in your eyes - you are\nmore than capable.",
 			"But be warned, the path to the\ndragon's lair is not for the faint\nof heart.",
 			"For now prove your strength to me\nand slay that evil shroom in the\nmonster forest.",
-			"If you manage to do that i will\nreward you and tell you more\nabout this kingdom."
+			"If you manage to do that i will\nreward you and tell you more\nabout this kingdom.",
+			"For now take this health potion\nand good luck."
 		}},
 		{QuestState::IN_PROGRESS, {
 			"The dragon's lair awaits,\nadventurer. Have you slain the\nevil shroom yet?",
@@ -173,13 +172,14 @@ void GameState::initNpc()
 	this->npcDialogueLisa = {
    {QuestState::NOT_TAKEN, {
 	  "So the rumers were true, there is\na new traveler in town",
-	  "I am Lisa, the kingdom's\nshopkeeper, but unfortunately\nmy cart was blocked ",
-	  "by a two-headed flower enemy\nin the magical garden",
-	  "If you can help me with\nthat, I will reward you plenty",
+	  "I am Lisa, the kingdom's\nshopkeeper, but unfortunately\nmy shop is closed",
+	  "until I can get a special\ningredient for my potions",
+	  "that is only obtainable\nfrom a two-headed flower\nenemy in the magical garden",
+	  "If you can get me 2 flowers\nfrom the enemy i will reward\nyou plenty",
    }},
    {QuestState::IN_PROGRESS, {
-	   "Have you slain the two-headed\nflower yet?",
-	   "Please hurry, I need to\nget my cart back to the kingdom."
+	   "Have you brought the two\nflowers yet?",
+	   "Please hurry, I need to\nopen my shop for the kingdom."
    }},
    {QuestState::COMPLETED, {
 	   "You've done me a great service,\ntraveler.",
@@ -188,8 +188,8 @@ void GameState::initNpc()
    }}
 	};
 
-	this->questStateDescriptionLisa = "Quest 2 : Slain the 2 headed flower \n\n Go to the magical garden and kill \n one flower enemy";
-	this->questStateDescriptionLisaFinished = "Quest 2 : Slain the 2 headed flower \n\n Go to the magical garden and kill \n one flower enemy \n\n COMPLETED";
+	this->questStateDescriptionLisa = "Quest 2 : Slay the 2 headed flower \n\n Go to the magical garden and obtain \n two flower enemy drops";
+	this->questStateDescriptionLisaFinished = "Quest 2 : Slay the 2 headed flower \n\n Go to the magical garden and obtain \n two flower enemy drops \n\n COMPLETED";
 
 	this->lisa = new Npc(this->textures["LISA"], this->textures["DIALOGUEBOX_LISA"],
 		questStateDescriptionLisa, questStateDescriptionLisaFinished,
@@ -238,6 +238,8 @@ void GameState::initInventoryMenu()
 	this->inventoryMenu.setPosition(50.f, 50.f);
 
 	//this->inventory = new Inventory();
+
+	this->playerInventory = new Inventory();
 }
 
 void GameState::initInventoryText()
@@ -296,6 +298,7 @@ void GameState::initInventoryText()
 
 
 
+
 //Constructor / Destructor
 GameState::GameState(StateData* state_data, Player* player)
 	: State(state_data), player(player)
@@ -318,10 +321,11 @@ this->initHouse();
 this->initInventoryMenu();
 this->initInventoryText();
 
+
 this->canEnterEnemyState = true;
 this->isInventoryMenuOpen = false;
-
-
+this->isFlowerPlantDead = false;
+this->isMushroomDead = false;
 
 }
 
@@ -334,6 +338,196 @@ GameState::~GameState()
 
 //Functions 
 
+//Inventory
+void GameState::addHealthPot()
+{
+	Item* healthPotion = new Item("potion_001", "Health Potion", 1, true, "assets/MF_Items/MF_Items_potions_9.png");
+	
+	// Add to player's inventory
+	this->playerInventory->addItem(healthPotion);
+}
+
+void GameState::addFlowerPlantLoot()
+{
+	Item* FlowerLoot = new Item("flowerPlantLoot", "Flower Petals", 1, true, "assets/MF_Items/MF_Items_flower_4.png");
+
+	this->playerInventory->addItem(FlowerLoot);
+}
+
+void GameState::addMushroomLoot()
+{
+	Item* MushroomLoot = new Item("mushroomLoot", "Mushroom Spores", 1, true, "assets/MF_Items/MF_Items_mushroom_1.png");
+
+	this->playerInventory->addItem(MushroomLoot);
+}
+
+
+//Quest
+void GameState::CompleteLisaQuest()
+{
+	std::string flowerId = "flowerPlantLoot";
+	std::cout << "Checking if player has 2 flower petals...\n" << this->playerInventory->getItemQuantity(flowerId);
+
+		this->lisa->setQuestState(QuestState::COMPLETED);
+		this->isCompletedLisa = true;
+		this->playerInventory->removeItem(flowerId, 2);
+
+}
+
+
+//Teleport the player to the enemy state
+void GameState::getToEnemyState(const float& dt)
+{
+	if (!this->canEnterEnemyState)
+	{
+		if (this->teleportCooldownClock.getElapsedTime().asSeconds() >= this->teleportCooldown)
+		{
+			this->canEnterEnemyState = true; // Enable teleportation
+			std::cout << "Cooldown ended, teleport enabled.\n";
+
+		}
+		return; // Prevent execution if cooldown is still active
+	}
+
+	sf::Vector2f playerPosition = this->player->getPosition();
+	sf::Vector2f targetPosition(2150.f, 1110.f); // Target zone for EnemyState
+
+	sf::Vector2f targetPosition2(2150.f, 510.f); // Target zone for EnemyState
+	// Check if the player is outside and re-enters the zone
+	static bool playerExitedZone = false;
+
+	if (playerPosition.x < targetPosition.x - 50.f || playerPosition.y < targetPosition.y - 50.f)
+	{
+		playerExitedZone = true; // Mark the player as having exited the zone
+	}
+
+	if (playerExitedZone &&
+		playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
+	{
+		std::cout << "Entering EnemyState!\n" << "QuestState for Klee: " << this->klee->toString(currentQuestState) << "\n";
+		std::cout << "Entering EnemyState!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
+
+		this->stateData->states->push(new EnemyState(this->stateData, this->player, this->klee, this->isMushroomDead));
+
+		this->canEnterEnemyState = false;
+		this->teleportCooldownClock.restart();
+		playerExitedZone = false; // Reset the zone exit flag
+		this->updateInventoryText(dt);
+	}
+
+	if (playerExitedZone &&
+		playerPosition.x >= targetPosition2.x && playerPosition.y >= targetPosition2.y &&
+		playerPosition.y <= targetPosition2.y + 50.f)
+	{
+		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Klee: " << this->klee->toString(currentQuestState) << "\n";
+		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
+
+
+		this->stateData->states->push(new EnemyStateMimic(this->stateData, this->player, this->lisa, this->isFlowerPlantDead));
+
+		this->canEnterEnemyState = false;
+		this->teleportCooldownClock.restart();
+		playerExitedZone = false; // Reset the zone exit flag
+		this->updateInventoryText(dt);
+	}
+
+
+	if (isMushroomDead)
+	{
+		std::cout << "Mushroom is dead, adding loot to inventory\n";
+		addMushroomLoot();
+		this->isMushroomDead = false;
+	}
+
+	if (isFlowerPlantDead)
+	{
+		std::cout << "Flower Plant is dead, adding loot to inventory\n";
+		addFlowerPlantLoot();
+		this->isFlowerPlantDead = false;
+	}
+
+
+}
+
+
+
+//NPC interactions and quest updates
+void GameState::updateInput(const float& dt)
+{
+	sf::Vector2f playerPos = this->player->getPosition();
+
+	const float interactionRange = 150.f;  // Adjust the range as needed
+
+
+	///FOR KLEE!!
+	if (this->klee->getDistanceToKlee(playerPos) < interactionRange) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && this->getKeyTime()) {
+			if (!this->klee->getIsTalking()) {
+				this->klee->startTalking();
+
+				if (this->klee->getQuestState() == QuestState::NOT_TAKEN) 
+					this->addHealthPot();
+			}
+
+			else {
+				this->klee->nextDialogue();
+			}
+		}
+	}
+
+
+	if (this->klee->getIsTalking() && this->klee->getDistanceToKlee(playerPos) >= interactionRange) {
+		this->klee->nextDialogue(); // End the dialogue or continue it
+	}
+
+
+	///FOR LISA!!
+	if (this->lisa->getDistanceToKlee(playerPos) < interactionRange) {
+		// If the player presses the "E" key and the dialogue isn't finished
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && this->getKeyTime()) {
+			// If the NPC is not talking yet, start the dialogue
+			if (!this->lisa->getIsTalking()) {
+				this->lisa->startTalking();
+
+				std::string flowerId = "flowerPlantLoot";
+				if (this->lisa->getQuestState() == QuestState::IN_PROGRESS && this->playerInventory->getItemQuantity(flowerId) >= 2)
+					this->CompleteLisaQuest();
+			}
+
+			else {
+				// If the NPC is talking, go to the next part of the dialogue
+				this->lisa->nextDialogue();
+			}
+		}
+	}
+
+
+	if (this->lisa->getIsTalking() && this->lisa->getDistanceToKlee(playerPos) >= interactionRange) {
+		this->lisa->nextDialogue(); // End the dialogue or continue it
+	}
+
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeyTime())
+	{
+		if (!this->paused)
+		{
+			this->pauseState();
+		}
+		else
+		{
+			this->unpauseState();
+		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("INVENTORY"))) && this->getKeyTime())
+	{
+		this->isInventoryMenuOpen = !this->isInventoryMenuOpen;
+	}
+	
+}
+
+
+//Update functions
 void GameState::updateView(const float& dt)
 {
 	sf::Vector2f playerPosition = this->player->getPosition();
@@ -365,82 +559,6 @@ void GameState::updateView(const float& dt)
 	// Update the view's center
 	this->view.setCenter(clampedCenter);
 }
-
-void GameState::updateInput(const float& dt)
-{
-	sf::Vector2f playerPos = this->player->getPosition();
-
-	const float interactionRange = 150.f;  // Adjust the range as needed
-
-
-	///FOR KLEE!!
-	if (this->klee->getDistanceToKlee(playerPos) < interactionRange) {
-		// If the player presses the "E" key and the dialogue isn't finished
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && this->getKeyTime()) {
-			// If the NPC is not talking yet, start the dialogue
-			if (!this->klee->getIsTalking()) {
-				std::cout << "Player is close to NPC, starting dialogue..." << std::endl;
-				this->klee->startTalking();
-			}
-
-			else {
-				// If the NPC is talking, go to the next part of the dialogue
-				std::cout << "Advancing dialogue..." << std::endl;
-				this->klee->nextDialogue();
-			}
-		}
-	}
-
-
-	if (this->klee->getIsTalking() && this->klee->getDistanceToKlee(playerPos) >= interactionRange) {
-		std::cout << "Player moved away from NPC, stopping dialogue..." << std::endl;
-		this->klee->nextDialogue(); // End the dialogue or continue it
-	}
-
-
-	///FOR LISA!!
-	if (this->lisa->getDistanceToKlee(playerPos) < interactionRange) {
-		// If the player presses the "E" key and the dialogue isn't finished
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && this->getKeyTime()) {
-			// If the NPC is not talking yet, start the dialogue
-			if (!this->lisa->getIsTalking()) {
-				std::cout << "Player is close to NPC, starting dialogue..." << std::endl;
-				this->lisa->startTalking();
-			}
-
-			else {
-				// If the NPC is talking, go to the next part of the dialogue
-				std::cout << "Advancing dialogue..." << std::endl;
-				this->lisa->nextDialogue();
-			}
-		}
-	}
-
-
-	if (this->lisa->getIsTalking() && this->lisa->getDistanceToKlee(playerPos) >= interactionRange) {
-		std::cout << "Player moved away from NPC, stopping dialogue..." << std::endl;
-		this->lisa->nextDialogue(); // End the dialogue or continue it
-	}
-
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeyTime())
-	{
-		if (!this->paused)
-		{
-			this->pauseState();
-		}
-		else
-		{
-			this->unpauseState();
-		}
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("INVENTORY"))) && this->getKeyTime())
-	{
-		this->isInventoryMenuOpen = !this->isInventoryMenuOpen;
-	}
-}
-
 
 void GameState::updatePlayerInput(const float & dt)
 {
@@ -493,60 +611,6 @@ void GameState::updateExpwhenComplete(const float& dt)
 
 }
 
-
-void GameState::getToEnemyState(const float& dt)
-{
-	if (!this->canEnterEnemyState)
-	{
-		if (this->teleportCooldownClock.getElapsedTime().asSeconds() >= this->teleportCooldown)
-		{
-			this->canEnterEnemyState = true; // Enable teleportation
-			std::cout << "Cooldown ended, teleport enabled.\n";
-		}
-		return; // Prevent execution if cooldown is still active
-	}
-
-	sf::Vector2f playerPosition = this->player->getPosition();
-	sf::Vector2f targetPosition(2150.f, 1110.f); // Target zone for EnemyState
-
-	sf::Vector2f targetPosition2(2150.f, 510.f); // Target zone for EnemyState
-	// Check if the player is outside and re-enters the zone
-	static bool playerExitedZone = false;
-
-	if (playerPosition.x < targetPosition.x - 50.f || playerPosition.y < targetPosition.y - 50.f)
-	{
-		playerExitedZone = true; // Mark the player as having exited the zone
-	}
-
-	if (playerExitedZone &&
-		playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
-	{
-		std::cout << "Entering EnemyState!\n" << "QuestState for Klee: "<< this->klee->toString(currentQuestState) <<"\n";
-		std::cout << "Entering EnemyState!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
-		this->stateData->states->push(new EnemyState(this->stateData,this->player,this->klee,this->lisa));
-		this->canEnterEnemyState = false;
-		this->teleportCooldownClock.restart();
-		playerExitedZone = false; // Reset the zone exit flag
-		this->updateInventoryText(dt);
-	}
-
-	if (playerExitedZone &&
-		playerPosition.x >= targetPosition2.x && playerPosition.y >= targetPosition2.y &&
-		playerPosition.y <= targetPosition2.y + 50.f)
-	{
-		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Klee: " << this->klee->toString(currentQuestState) << "\n";
-		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
-		this->stateData->states->push(new EnemyStateMimic(this->stateData, this->player, this->klee, this->lisa));
-		this->canEnterEnemyState = false;
-		this->teleportCooldownClock.restart();
-		playerExitedZone = false; // Reset the zone exit flag
-		this->updateInventoryText(dt);
-	}
-
-}
-
-
-
 void GameState::updatePauseMenuButtons()
 {
 	if (this->pmenu->isButtonPressed("MAIN MENU"))
@@ -592,6 +656,9 @@ void GameState::update(const float& dt)
 	}
 
 }
+
+
+//Render functions
 
 void GameState::renderHouses(sf::RenderTarget& target)
 {
@@ -654,6 +721,8 @@ void GameState::render(sf::RenderTarget* target)
 	if (this->isInventoryMenuOpen)
 {
 	this->renderInventoryMenu(this->renderTexture);
+	sf::Vector2f inventoryPosition(667, 300); // Example position
+	this->playerInventory->render(this->renderTexture , this->inventoryMenuTexture, inventoryPosition);
 }
 
 if (this->paused) //paused menu render

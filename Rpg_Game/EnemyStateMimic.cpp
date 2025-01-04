@@ -16,7 +16,7 @@ void EnemyStateMimic::initDeferredRender()
 void EnemyStateMimic::initVariables()
 {
 	this->turn = 1; // Player's turn initially
-	this->gameWon = false; // Game hasn't ended initially
+	//this->gameWon = false; // Game hasn't ended initially
 	this->messageDuration = 3.f; // Display message for 5 seconds
 	this->isGameOver = false;
 	this->messageTimer.restart();
@@ -206,8 +206,8 @@ void EnemyStateMimic::initTurnText()
 
 
 
-EnemyStateMimic::EnemyStateMimic(StateData* state_data, Player* player, Npc* KleeNpc, Npc* LisaNpc)
-	: State(state_data), player(player), KleeNpc(KleeNpc), LisaNpc(LisaNpc)
+EnemyStateMimic::EnemyStateMimic(StateData* state_data, Player* player, Npc* LisaNpc, bool& gameWon)
+	: State(state_data), player(player), LisaNpc(LisaNpc), gameWon(gameWon)
 {
 
 	this->initDeferredRender();
@@ -295,7 +295,7 @@ void EnemyStateMimic::updateGame(const float& dt)
 
 	if (player->getAttributeComponent()->hp <= 0 || this->enemy->hp <= 0)
 	{
-		this->gameWon = true;  // Mark the game as over
+		
 		this->messageTimer.restart();  // Restart the message timer
 		this->isGameOver = true; // Set the game over flag to true
 
@@ -308,10 +308,9 @@ void EnemyStateMimic::updateGame(const float& dt)
 		{
 			this->winnerText.setString("Player Won!");
 			this->player->gainExp(100); // Add EXP
+			this->gameWon = true;  // Mark the game as over
 
 
-			if (this->LisaNpc->getQuestState() == QuestState::IN_PROGRESS)
-				this->LisaNpc->setQuestState(QuestState::COMPLETED); // Complete the quest
 		}
 
 		// Start the message timer so the state knows to wait for a few seconds

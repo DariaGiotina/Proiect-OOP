@@ -11,17 +11,11 @@
 #include "Npc.h"
 #include "Inventory.h"
 
-class PauseMenu;
-class TileMap;
-class Player;
-class PlayerGUI;
-class sf::View;
-class sf::Font;
-class sf::RenderTexture;
 
 class GameState : public State
 {
 private:
+	//Variables
 	sf::View view;
 	sf::RenderTexture renderTexture;
 	sf::Sprite renderSprite;
@@ -30,20 +24,28 @@ private:
 	bool canEnterEnemyState;
 	sf::Clock teleportCooldownClock;
 	const float teleportCooldown = 2.f;
+
+	//Booleans
 	bool isInventoryMenuOpen;
 	bool isCompletedKlee;
 	bool isCompletedLisa;
+	bool isFlowerPlantDead;
+	bool isMushroomDead;
 
 	sf::Font font;
 	sf::Font font2;
 	PauseMenu *pmenu;
 
+	//Objects
 	Player *player;
 	PlayerGUI* playerGUI;
 	Npc* klee;
 	Npc* lisa;
 	TileMap* tileMap;
 	AttributeComponent* attributeComponent;
+	Inventory* playerInventory;
+	
+	//Quest
 	std::map<QuestState, std::vector<std::string>> npcDialogueKlee;
 	std::map<QuestState, std::vector<std::string>> npcDialogueLisa;
 	QuestState* currentQuestState;
@@ -68,6 +70,8 @@ private:
 	sf::RectangleShape inventoryMenu;
 	sf::Texture inventoryMenuTexture;
 
+
+	//Inventory Text
 	sf::Text inventoryTextlevel;
 	sf::Text inventoryTexthealth;
 
@@ -78,9 +82,8 @@ private:
 	sf::Text inventoryTextintelligence;
 	sf::Text inventoryTextcharisma;
 
-	Inventory* inventory;
 
-	//Functions
+	//Initializers
 	void initDeferredRender();
 	void initView();
 	void initKeybinds();
@@ -96,20 +99,35 @@ private:
 	void initInventoryText();
 
 public:
+	//Constructors/Destructors
 		GameState(StateData* state_data, Player* player);
 		virtual ~GameState();
 
 
 	//functions
-		void updateView(const float& dt);
+
+		//Inventory
+		void addHealthPot();
+		void addFlowerPlantLoot();
+		void addMushroomLoot();
+
+		//Quest
+		void CompleteLisaQuest();
+
+		//Teleport
+		void getToEnemyState(const float& dt);
+
+		//Update
 		void updateInput(const float& dt);
+		void updateView(const float& dt);
 		void updatePlayerInput(const float& dt);
 		void updatePlayerGUI(const float& dt);
 		void updateInventoryText(const float& dt);
 		void updateExpwhenComplete(const float& dt);
-		void getToEnemyState(const float& dt);
 		void updatePauseMenuButtons();
 		void update(const float& dt);
+
+		//Render
 		void renderHouses(sf::RenderTarget& target);
 		void renderInventoryMenu(sf::RenderTarget& target);
 		void render(sf::RenderTarget* target = nullptr);

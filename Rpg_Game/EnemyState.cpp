@@ -16,7 +16,6 @@ void EnemyState::initDeferredRender()
 void EnemyState::initVariables()
 {
 	this->turn = 1; // Player's turn initially
-	this->gameWon = false; // Game hasn't ended initially
 	this->messageDuration = 3.f; // Display message for 5 seconds
 	this->isGameOver = false;
 	this->messageTimer.restart();
@@ -206,8 +205,8 @@ void EnemyState::initTurnText()
 
 
 
-EnemyState::EnemyState(StateData* state_data,Player* player,Npc* KleeNpc,Npc* LisaNpc)
-	: State(state_data), player(player), KleeNpc(KleeNpc), LisaNpc(LisaNpc)
+EnemyState::EnemyState(StateData* state_data,Player* player,Npc* KleeNpc,bool& gameWon)
+	: State(state_data), player(player), KleeNpc(KleeNpc), gameWon(gameWon)
 {
 
 	this->initDeferredRender();
@@ -295,7 +294,6 @@ void EnemyState::updateGame(const float& dt)
 
 	if (player->getAttributeComponent()->hp <= 0 || this->enemy->hp <= 0)
 	{
-		this->gameWon = true;  // Mark the game as over
 		this->messageTimer.restart();  // Restart the message timer
 		this->isGameOver = true; // Set the game over flag to true
 
@@ -308,7 +306,8 @@ void EnemyState::updateGame(const float& dt)
 		{
 			this->winnerText.setString("Player Won!");
 			this->player->gainExp(100); // Add EXP
-	
+			this->gameWon = true;
+
 			if(this->KleeNpc->getQuestState() == QuestState::IN_PROGRESS)
 				this->KleeNpc->setQuestState(QuestState::COMPLETED); // Complete the quest
 		

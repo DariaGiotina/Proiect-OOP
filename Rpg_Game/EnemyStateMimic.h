@@ -22,7 +22,7 @@ private:
 	int level;
 
 	//Delay game over
-	bool gameWon;
+	bool& gameWon;
 	bool isGameOver;
 	float messageDuration;    // Duration to display the message (5 seconds)
 	sf::Clock messageTimer;   // Timer for the message
@@ -82,7 +82,7 @@ private:
 	void initEnemyHPBar();
 	void initTurnText();
 public:
-	EnemyStateMimic(StateData* state_data, Player* player, Npc* KleeNpc, Npc* LisaNpc);
+	EnemyStateMimic(StateData* state_data, Player* player, Npc* LisaNpc,bool& gameWon);
 	virtual ~EnemyStateMimic();
 
 	const bool isButtonPressed(const std::string key);

@@ -206,22 +206,3 @@ void Npc::renderDialogue(sf::RenderTarget& target)
 		break;
 	}
 }
-
-//void Npc::renderBoundingBox(sf::RenderTarget& target)
-//{
-//	sf::FloatRect bounds = sprite.getGlobalBounds();
-//	sf::RectangleShape outline(sf::Vector2f(bounds.width, bounds.height));
-//	outline.setPosition(bounds.left, bounds.top);
-//	outline.setFillColor(sf::Color(0, 255, 0, 50));  // Light green fill for visibility
-//	outline.setOutlineColor(sf::Color::Red);         // Red outline
-//	outline.setOutlineThickness(2);
-//	target.draw(outline);  // Draw the bounding box
-//}
-
-//void Npc::render(sf::RenderTarget& target)
-//{
-//	renderNpc(target);
-//	renderDialogue(target);
-//	//renderBoundingBox(target);
-//
-//}
