@@ -200,6 +200,9 @@ void GameState::initNpc()
 
 
 	this->isCompletedLisa = false;
+
+
+
 }
 
 void GameState::initTileMap()
@@ -366,13 +369,67 @@ void GameState::addMushroomLoot()
 void GameState::CompleteLisaQuest()
 {
 	std::string flowerId = "flowerPlantLoot";
-	std::cout << "Checking if player has 2 flower petals...\n" << this->playerInventory->getItemQuantity(flowerId);
+	std::cout << "Checking if player has 2 flower petals...\n";
+	std::cout << this->playerInventory->getItemQuantity(flowerId) << "\n";
 
-		this->lisa->setQuestState(QuestState::COMPLETED);
-		this->isCompletedLisa = true;
-		this->playerInventory->removeItem(flowerId, 2);
+	lisa->setQuestState(QuestState::COMPLETED);
+	isCompletedLisa = true;
+	playerInventory->removeItem(flowerId, 2);
+
+	// Explicitly call checkQuestCompletion for Lisa
+	checkQuestCompletion(lisa);
 
 }
+
+void GameState::addQuest(const std::string& description, QuestState intialState, Npc* npc)
+{
+	Quest newQuest;
+	newQuest.questText.setFont(this->font);
+	newQuest.questText.setString(description);
+	newQuest.questText.setCharacterSize(25);
+	newQuest.questText.setFillColor(sf::Color::Color(80, 18, 63, 255));
+	newQuest.state = intialState;
+	newQuest.npc = npc;  // Link to the NPC
+
+	activeQuests.push_back(newQuest);
+	updateQuestPositions();
+}
+
+void GameState::removeQuest(int index)
+{
+	if (index >= 0 && index < activeQuests.size()) {
+		std::cout << "Removing quest at index " << index << "\n";
+		activeQuests.erase(activeQuests.begin() + index);
+		updateQuestPositions();
+	}
+}
+
+void GameState::updateQuestPositions()
+{
+	float startX = 10.f;  // Starting x-position for quests
+	float startY = 350.f;  // Starting y-position for the first quest
+	float verticalSpacing = 150.f;  // Spacing between quests
+
+	for (size_t i = 0; i < activeQuests.size(); ++i) {
+		activeQuests[i].questText.setPosition(startX, startY + i * verticalSpacing);
+	}
+}
+
+void GameState::checkQuestCompletion(Npc* npc) {
+
+	for (size_t i = 0; i < activeQuests.size(); ++i) {
+		Quest& quest = activeQuests[i];
+
+		if (quest.npc == npc /*&& quest.state == QuestState::COMPLETED*/) {
+			std::cout << "Removing completed quest for NPC: " << typeid(*npc).name() << "\n";
+			quest.state = QuestState::FINISHED;
+			removeQuest(i);
+			this->player->gainExp(200);
+			--i;  // Adjust index after removal
+		}
+	}
+}
+
 
 
 //Teleport the player to the enemy state
@@ -465,8 +522,23 @@ void GameState::updateInput(const float& dt)
 			if (!this->klee->getIsTalking()) {
 				this->klee->startTalking();
 
-				if (this->klee->getQuestState() == QuestState::NOT_TAKEN) 
+				if (this->klee->getQuestState() == QuestState::NOT_TAKEN) {
+					this->questStateDescriptionKlee = "Quest : Prove your strength \n\n Go to the enchanted forest and kill \n one mushroom enemy";
+					addQuest(
+						questStateDescriptionKlee,
+						QuestState::IN_PROGRESS,
+						klee
+					);
 					this->addHealthPot();
+				}
+					
+			}
+
+			if (this->klee->getQuestState() == QuestState::COMPLETED) {				
+				this->klee->nextDialogue();
+				if (!this->klee->getIsTalking()) {
+					checkQuestCompletion(klee);
+					}
 			}
 
 			else {
@@ -477,7 +549,7 @@ void GameState::updateInput(const float& dt)
 
 
 	if (this->klee->getIsTalking() && this->klee->getDistanceToKlee(playerPos) >= interactionRange) {
-		this->klee->nextDialogue(); // End the dialogue or continue it
+		this->klee->nextDialogue(); 
 	}
 
 
@@ -488,6 +560,16 @@ void GameState::updateInput(const float& dt)
 			// If the NPC is not talking yet, start the dialogue
 			if (!this->lisa->getIsTalking()) {
 				this->lisa->startTalking();
+
+				if (this->lisa->getQuestState() == QuestState::NOT_TAKEN) {
+					this->questStateDescriptionLisa = "Quest : Slay the 2 headed flower \n\n Go to the magical garden and obtain \n two flower enemy drops";
+					addQuest(
+						questStateDescriptionLisa,
+						QuestState::IN_PROGRESS,
+						lisa
+					);
+	
+				}
 
 				std::string flowerId = "flowerPlantLoot";
 				if (this->lisa->getQuestState() == QuestState::IN_PROGRESS && this->playerInventory->getItemQuantity(flowerId) >= 2)
@@ -597,13 +679,13 @@ void GameState::updateInventoryText(const float& dt)
 
 void GameState::updateExpwhenComplete(const float& dt)
 {
-	if (this->klee->getQuestState() == QuestState::COMPLETED && this->klee->getIsTalking() && !isCompletedKlee) {
+	if (this->klee->getQuestState() == QuestState::FINISHED && this->klee->getIsTalking() && !isCompletedKlee) {
 		this->player->gainExp(200);
 		this->isCompletedKlee = true;
 	}
 
 
-	if (this->lisa->getQuestState() == QuestState::COMPLETED && this->lisa->getIsTalking() && !isCompletedLisa) {
+	if (this->lisa->getQuestState() == QuestState::FINISHED && this->lisa->getIsTalking() && !isCompletedLisa) {
 		this->player->gainExp(200);
 		this->isCompletedLisa = true;
 		//this->lisa->setQuestState(QuestState::FINISHED);
@@ -660,6 +742,13 @@ void GameState::update(const float& dt)
 
 //Render functions
 
+void GameState::renderQuests(sf::RenderTarget& target)
+{
+	for (const auto& quest : activeQuests) {
+		target.draw(quest.questText);
+	}
+}
+
 void GameState::renderHouses(sf::RenderTarget& target)
 {
 	target.draw(this->AdventureHouse);
@@ -700,6 +789,7 @@ void GameState::render(sf::RenderTarget* target)
 
 	//Render Houses
 	this->renderHouses(this->renderTexture);
+	;
 
 	//Render NPC
 	this->klee->renderNpc(this->renderTexture);
@@ -713,6 +803,8 @@ void GameState::render(sf::RenderTarget* target)
 
 	//Render GUI
 	this->playerGUI->render(this->renderTexture);
+
+	this->renderQuests(this->renderTexture);
 
 	this->klee->renderDialogue(this->renderTexture);
 	this->lisa->renderDialogue(this->renderTexture);

@@ -66,7 +66,13 @@ Npc::Npc(const sf::Texture& texture,const sf::Texture& dialogueTexture,
 	const std::map<QuestState,
 	std::vector<std::string>>& dialogueMap,
 	sf::Vector2f position, const sf::RenderWindow& window,float size_x, float size_y)
-	:dialogues(dialogueMap), dialogueIndex(0), isTalking(false), window(window), questState(QuestState::NOT_TAKEN), sprite_size_x(size_x), sprite_size_y(size_y), questStateDescription(questStateDescription),questStateDescriptionFinished(questStateDescriptionFinished), questPosX(questPosX), questPosY(questPosY)
+
+	:dialogues(dialogueMap), dialogueIndex(0), isTalking(false), 
+	window(window), questState(QuestState::NOT_TAKEN), 
+	sprite_size_x(size_x), sprite_size_y(size_y), 
+	questStateDescription(questStateDescription),questStateDescriptionFinished(questStateDescriptionFinished),
+	questPosX(questPosX), questPosY(questPosY),
+	hasDisplayedFinalDialogue(false)
 {
 
 	this->initTextures();
@@ -96,6 +102,10 @@ void Npc::setQuestState(QuestState newState)
 	else if (questState == QuestState::IN_PROGRESS) {
 		dialogueIndex = 0;
 
+	}
+
+	if (newState == QuestState::COMPLETED) {
+		hasDisplayedFinalDialogue = false;  // Reset flag when quest is completed
 	}
 }
 
@@ -134,12 +144,22 @@ void Npc::nextDialogue() {
 		++dialogueIndex;
 		updateDialogueText();
 	}
-	else if(this->questState == QuestState::IN_PROGRESS || this->questState == QuestState::NOT_TAKEN) {
-		isTalking = false;  // End dialogue if no more text
-		this->setQuestState(QuestState::IN_PROGRESS);
+	else if (questState == QuestState::NOT_TAKEN) {
+		// Only transition to IN_PROGRESS after finishing all "NOT_TAKEN" dialogues
+		if (dialogueIndex >= dialogues[QuestState::NOT_TAKEN].size()) {
+			isTalking = false;
+			setQuestState(QuestState::IN_PROGRESS);
+		}
+	}
+	else if (questState == QuestState::COMPLETED && !hasDisplayedFinalDialogue) {
+		hasDisplayedFinalDialogue = true;  // Mark final dialogue shown
+	}
+	else if (questState == QuestState::COMPLETED && hasDisplayedFinalDialogue) {
+		isTalking = false;
+		setQuestState(QuestState::FINISHED);  // Transition to FINISHED state
 	}
 	else {
-		isTalking = false;
+		isTalking = false;  // Default behavior for unhandled cases
 	}
 }
 
@@ -151,6 +171,7 @@ bool Npc::getIsTalking() const
 void Npc::startTalking()
 {
 	isTalking = true;
+	dialogueIndex = 0;  // Reset to the start of the dialogue
 	updateDialogueText();
 }
 
@@ -187,22 +208,6 @@ void Npc::renderDialogue(sf::RenderTarget& target)
 		target.draw(nextText);
 	}
 
-	switch (questState)
-	{
-	case QuestState::NOT_TAKEN:
-		break;
-	case QuestState::IN_PROGRESS:
-		questStateText.setString(questStateDescription);
-		target.draw(questStateText);
-		break;
-	case QuestState::COMPLETED:
-		questStateText.setString(questStateDescriptionFinished); 
-		questStateText.setStyle(sf::Text::StrikeThrough);
-		target.draw(questStateText);
-		break;
-	case QuestState::FINISHED:
-		break;
-	default:
-		break;
-	}
+
+
 }

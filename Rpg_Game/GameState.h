@@ -41,6 +41,7 @@ private:
 	PlayerGUI* playerGUI;
 	Npc* klee;
 	Npc* lisa;
+	Npc* npc;
 	TileMap* tileMap;
 	AttributeComponent* attributeComponent;
 	Inventory* playerInventory;
@@ -48,6 +49,7 @@ private:
 	//Quest
 	std::map<QuestState, std::vector<std::string>> npcDialogueKlee;
 	std::map<QuestState, std::vector<std::string>> npcDialogueLisa;
+	std::vector<Quest> activeQuests;
 	QuestState* currentQuestState;
 	sf::String questStateDescriptionKlee;
 	sf::String questStateDescriptionLisa;
@@ -113,6 +115,11 @@ public:
 
 		//Quest
 		void CompleteLisaQuest();
+		void addQuest(const std::string& description, QuestState intialState, Npc* npc);
+		void removeQuest(int index);
+		void updateQuestPositions();
+		void checkQuestCompletion(Npc* npc);
+
 
 		//Teleport
 		void getToEnemyState(const float& dt);
@@ -128,6 +135,7 @@ public:
 		void update(const float& dt);
 
 		//Render
+		void renderQuests(sf::RenderTarget& target);
 		void renderHouses(sf::RenderTarget& target);
 		void renderInventoryMenu(sf::RenderTarget& target);
 		void render(sf::RenderTarget* target = nullptr);

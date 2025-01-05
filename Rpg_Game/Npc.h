@@ -10,6 +10,14 @@ enum class QuestState {
 	FINISHED
 };
 
+class Npc;
+
+struct Quest {
+	sf::Text questText;
+	QuestState state;
+	Npc* npc;
+};
+
 class Npc
 {
 private:
@@ -19,7 +27,6 @@ private:
 	sf::RectangleShape DialogueBox;
 	std::map<QuestState, std::vector<std::string>> dialogues;
 	size_t dialogueIndex;
-	bool isTalking;
 	sf::Text dialogueText;
 	sf::Text nextText;
 	sf::Text questStateText;
@@ -27,6 +34,8 @@ private:
 	sf::String questStateDescriptionFinished;
 	const sf::RenderWindow& window;
 
+	bool isTalking;
+	bool hasDisplayedFinalDialogue;
 
 	sf::Font font;
 	sf::Texture texture;
@@ -45,6 +54,9 @@ private:
 	void initDialogue(const std::string& text, const sf::Texture* dialogueTexture);
 	void initQuestStateText();
 public:
+
+
+
 	Npc(const sf::Texture& texture, const sf::Texture& dialogueTexture,
 		const sf::String& questStateDescription, const sf::String& questStateDescriptionFinished,
 		const float& questPosX, const float& questPosY,
