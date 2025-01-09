@@ -31,6 +31,9 @@ public:
 	void loseHP(const int hp);
 	void gainHP(const int hp);
 	void gainExp(const unsigned exp);
+	void gainMoney(const int money);
+	void loseMoney(const int money);
+
 	void startAttackAnimation(const float& dt, int animationnumber);
 	virtual void updateAnimation(const float& dt);
 	void update(const float& dt);

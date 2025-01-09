@@ -92,6 +92,7 @@ Npc::~Npc()
 
 
 }
+
 void Npc::setQuestState(QuestState newState)
 {
 	if (questState != newState) {

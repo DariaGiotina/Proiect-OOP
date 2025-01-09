@@ -19,6 +19,7 @@ AttributeComponent::AttributeComponent()
 	this->charisma = 1;
 
 	this->hpMax = 4;
+	this->money = 500;
 
 	this->updateLevel();
 	this->updateStats(true);
@@ -49,6 +50,11 @@ void AttributeComponent::gainExp(const unsigned GainedExp)
 	std::cout << "Gained Exp: " << GainedExp << "\n";
 	this->exp += GainedExp; // Add the gained EXP
 	this->updateLevel();
+}
+
+int AttributeComponent::getMoney() const
+{
+	return this->money;
 }
 
 void AttributeComponent::updateStats(const bool reset)

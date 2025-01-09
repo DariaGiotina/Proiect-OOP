@@ -10,6 +10,7 @@
 #include "EnemyStateMimic.h"
 #include "Npc.h"
 #include "Inventory.h"
+#include "Shop.h"
 
 
 class GameState : public State
@@ -31,12 +32,17 @@ private:
 	bool isCompletedLisa;
 	bool isFlowerPlantDead;
 	bool isMushroomDead;
+	bool lisaShopUnlocked;
+	bool showMenu = false;
+	bool pauseForShop = false;
+	bool mousePressed = false;
 
 	sf::Font font;
 	sf::Font font2;
-	PauseMenu *pmenu;
+
 
 	//Objects
+	PauseMenu* pmenu;
 	Player *player;
 	PlayerGUI* playerGUI;
 	Npc* klee;
@@ -45,7 +51,10 @@ private:
 	TileMap* tileMap;
 	AttributeComponent* attributeComponent;
 	Inventory* playerInventory;
-	
+	Shop* shopmenu;
+
+	std::map<std::string, Item*> items;
+
 	//Quest
 	std::map<QuestState, std::vector<std::string>> npcDialogueKlee;
 	std::map<QuestState, std::vector<std::string>> npcDialogueLisa;
@@ -83,6 +92,8 @@ private:
 	sf::Text inventoryTextwisdom;
 	sf::Text inventoryTextintelligence;
 	sf::Text inventoryTextcharisma;
+	sf::Text inventoryTextmoney;
+
 
 
 	//Initializers
@@ -99,6 +110,8 @@ private:
 	void initHouse();
 	void initInventoryMenu();
 	void initInventoryText();
+	void initLisaMenu();
+
 
 public:
 	//Constructors/Destructors
@@ -124,6 +137,11 @@ public:
 		//Teleport
 		void getToEnemyState(const float& dt);
 
+		//Shop
+		void updateItemSelection(const sf::Vector2i& mousePosWindow, Inventory* inventory, Shop* shop, Player* player);
+
+		void updateHealthBarwithPotion(const sf::Vector2i& mousePosWindow, Inventory* inventory, Player* player);
+
 		//Update
 		void updateInput(const float& dt);
 		void updateView(const float& dt);
@@ -138,6 +156,7 @@ public:
 		void renderQuests(sf::RenderTarget& target);
 		void renderHouses(sf::RenderTarget& target);
 		void renderInventoryMenu(sf::RenderTarget& target);
+		void renderInventoryMoney(sf::RenderTarget& target);
 		void render(sf::RenderTarget* target = nullptr);
 };
 #endif 

@@ -64,6 +64,7 @@ const std::string& gui::Button::getText() const
 	return this->text.getString();
 }
 
+
 //Modifier
 void gui::Button::setText(const std::string text)
 {
@@ -303,3 +304,5 @@ void gui::TextureSelector::render(sf::RenderTarget& target)
 	}
 	this->hide_btn->render(target);
 }
+
+

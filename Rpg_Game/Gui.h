@@ -103,5 +103,6 @@ public:
 	void update(const sf::Vector2i& mousePosWindow, const float& dt);
 	void render(sf::RenderTarget& target);
 };
+
 }
 #endif // !BUTTON_H

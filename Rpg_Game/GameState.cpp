@@ -109,6 +109,8 @@ void GameState::initTextures()
 		throw("ERROR::PLAYERGUI::COULD NOT LOAD INVENTORY TEXTURE");
 	}
 
+
+
 }
 
 void GameState::initPauseMenu()
@@ -153,6 +155,10 @@ void GameState::initNpc()
 			"Now, the road to the dragon's lair\nis clear. Go and claim your prize.",
 			"Remember, adventurer, the\nkingdom will forever be in your\ndebt.",
 			"(You receive 200 exp)"
+		}},
+		 {QuestState::FINISHED, {
+			"My shop is open for\nyou traveler,",
+			"Do you want to see my wares?."
 		}}
 	};
 
@@ -200,6 +206,7 @@ void GameState::initNpc()
 
 
 	this->isCompletedLisa = false;
+	this->lisaShopUnlocked = false;
 
 
 
@@ -297,7 +304,25 @@ void GameState::initInventoryText()
 	this->inventoryTextcharisma.setPosition(600.f, 830.f);
 	this->inventoryTextcharisma.setString(sf::String(std::to_string(this->player->getAttributeComponent()->charisma)));
 
+	this->inventoryTextmoney.setFont(this->font2);
+	this->inventoryTextmoney.setCharacterSize(20);
+	this->inventoryTextmoney.setFillColor(sf::Color(96, 68, 93, 255));
+	this->inventoryTextmoney.setPosition(530.f, 917.f);
+	this->inventoryTextmoney.setString(sf::String(std::to_string(this->player->getAttributeComponent()->money)));
+
 }
+
+void GameState::initLisaMenu()
+{
+
+	this->shopmenu = new Shop(this->font, playerInventory,player);
+
+	this->shopmenu->addButton("OPEN SHOP", 1330.f, 775.f, "Open Shop");
+	this->shopmenu->addButton("CLOSE", 1330.f, 875.f, "Close");
+
+
+}
+
 
 
 
@@ -321,8 +346,11 @@ this->initNpc();
 this->initTileMap();
 this->initHouse();
 
+
 this->initInventoryMenu();
 this->initInventoryText();
+
+this->initLisaMenu();
 
 
 this->canEnterEnemyState = true;
@@ -337,6 +365,11 @@ GameState::~GameState()
 	delete this->pmenu;
 	delete this->tileMap;
 	delete this->playerGUI;
+	delete this->playerInventory;
+	delete this->shopmenu;
+	delete this->klee;
+	delete this->lisa;
+
 }
 
 //Functions 
@@ -344,7 +377,7 @@ GameState::~GameState()
 //Inventory
 void GameState::addHealthPot()
 {
-	Item* healthPotion = new Item("potion_001", "Health Potion", 1, true, "assets/MF_Items/MF_Items_potions_9.png");
+	Item* healthPotion = new Item("potion_001", "Health Potion", 1, true, "assets/MF_Items/MF_Items_potions_9.png",10);
 	
 	// Add to player's inventory
 	this->playerInventory->addItem(healthPotion);
@@ -352,14 +385,14 @@ void GameState::addHealthPot()
 
 void GameState::addFlowerPlantLoot()
 {
-	Item* FlowerLoot = new Item("flowerPlantLoot", "Flower Petals", 1, true, "assets/MF_Items/MF_Items_flower_4.png");
+	Item* FlowerLoot = new Item("flowerPlantLoot", "Flower Petals", 1, true, "assets/MF_Items/MF_Items_flower_4.png",5);
 
 	this->playerInventory->addItem(FlowerLoot);
 }
 
 void GameState::addMushroomLoot()
 {
-	Item* MushroomLoot = new Item("mushroomLoot", "Mushroom Spores", 1, true, "assets/MF_Items/MF_Items_mushroom_1.png");
+	Item* MushroomLoot = new Item("mushroomLoot", "Mushroom Spores", 1, true, "assets/MF_Items/MF_Items_mushroom_1.png",3);
 
 	this->playerInventory->addItem(MushroomLoot);
 }
@@ -369,7 +402,6 @@ void GameState::addMushroomLoot()
 void GameState::CompleteLisaQuest()
 {
 	std::string flowerId = "flowerPlantLoot";
-	std::cout << "Checking if player has 2 flower petals...\n";
 	std::cout << this->playerInventory->getItemQuantity(flowerId) << "\n";
 
 	lisa->setQuestState(QuestState::COMPLETED);
@@ -378,6 +410,8 @@ void GameState::CompleteLisaQuest()
 
 	// Explicitly call checkQuestCompletion for Lisa
 	checkQuestCompletion(lisa);
+
+	lisaShopUnlocked = true;
 
 }
 
@@ -398,7 +432,6 @@ void GameState::addQuest(const std::string& description, QuestState intialState,
 void GameState::removeQuest(int index)
 {
 	if (index >= 0 && index < activeQuests.size()) {
-		std::cout << "Removing quest at index " << index << "\n";
 		activeQuests.erase(activeQuests.begin() + index);
 		updateQuestPositions();
 	}
@@ -421,7 +454,6 @@ void GameState::checkQuestCompletion(Npc* npc) {
 		Quest& quest = activeQuests[i];
 
 		if (quest.npc == npc /*&& quest.state == QuestState::COMPLETED*/) {
-			std::cout << "Removing completed quest for NPC: " << typeid(*npc).name() << "\n";
 			quest.state = QuestState::FINISHED;
 			removeQuest(i);
 			this->player->gainExp(200);
@@ -440,7 +472,6 @@ void GameState::getToEnemyState(const float& dt)
 		if (this->teleportCooldownClock.getElapsedTime().asSeconds() >= this->teleportCooldown)
 		{
 			this->canEnterEnemyState = true; // Enable teleportation
-			std::cout << "Cooldown ended, teleport enabled.\n";
 
 		}
 		return; // Prevent execution if cooldown is still active
@@ -461,9 +492,7 @@ void GameState::getToEnemyState(const float& dt)
 	if (playerExitedZone &&
 		playerPosition.x >= targetPosition.x && playerPosition.y >= targetPosition.y)
 	{
-		std::cout << "Entering EnemyState!\n" << "QuestState for Klee: " << this->klee->toString(currentQuestState) << "\n";
-		std::cout << "Entering EnemyState!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
-
+	
 		this->stateData->states->push(new EnemyState(this->stateData, this->player, this->klee, this->isMushroomDead));
 
 		this->canEnterEnemyState = false;
@@ -476,34 +505,110 @@ void GameState::getToEnemyState(const float& dt)
 		playerPosition.x >= targetPosition2.x && playerPosition.y >= targetPosition2.y &&
 		playerPosition.y <= targetPosition2.y + 50.f)
 	{
-		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Klee: " << this->klee->toString(currentQuestState) << "\n";
-		std::cout << "Entering EnemyStateMimic!\n" << "QuestState for Lisa: " << this->lisa->toString(currentQuestState) << "\n";
 
 
 		this->stateData->states->push(new EnemyStateMimic(this->stateData, this->player, this->lisa, this->isFlowerPlantDead));
 
 		this->canEnterEnemyState = false;
 		this->teleportCooldownClock.restart();
-		playerExitedZone = false; // Reset the zone exit flag
+		playerExitedZone = false;
 		this->updateInventoryText(dt);
 	}
 
 
 	if (isMushroomDead)
 	{
-		std::cout << "Mushroom is dead, adding loot to inventory\n";
 		addMushroomLoot();
 		this->isMushroomDead = false;
 	}
 
 	if (isFlowerPlantDead)
 	{
-		std::cout << "Flower Plant is dead, adding loot to inventory\n";
+
 		addFlowerPlantLoot();
 		this->isFlowerPlantDead = false;
 	}
 
 
+}
+
+void GameState::updateItemSelection(const sf::Vector2i& mousePosWindow, Inventory* inventory, Shop* shop, Player* player)
+{
+	float slotSize = 65.0f;
+	float padding = 10.0f;
+
+	int cols = 3; // Number of columns
+	int row = 7;
+	int currentSlot = 0;
+
+	for (auto& pair : inventory->getItems()) {  // Access items via Inventory
+		const Item* item = pair.second;
+		int row = currentSlot / cols;
+		int col = currentSlot % cols;
+
+		float x = 667.f + col * (slotSize + padding);  // Adjust x position for inventory
+		float y = 300.f + row * (slotSize + padding);  // Adjust y position for inventory
+
+		sf::FloatRect itemBounds(x, y, slotSize, slotSize);
+
+		// Check if mouse click is within item bounds
+		if (itemBounds.contains(static_cast<sf::Vector2f>(mousePosWindow))) {
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !mousePressed) {
+				mousePressed = true;
+
+				// Delegate to Shop's handleSell method
+				shop->handleSell(pair.first, player);
+
+			}
+		}
+
+		currentSlot++;
+	}
+
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+		mousePressed = false;
+	}
+}
+
+void GameState::updateHealthBarwithPotion(const sf::Vector2i& mousePosWindow, Inventory* inventory, Player* player)
+{
+
+	float slotSize = 65.0f;
+	float padding = 10.0f;
+
+	int cols = 3; // Number of columns
+	int row = 7;
+	int currentSlot = 0;
+
+	for (auto& pair : inventory->getItems()) {  // Access items via Inventory
+		const Item* item = pair.second;
+		int row = currentSlot / cols;
+		int col = currentSlot % cols;
+
+		float x = 667.f + col * (slotSize + padding);  // Adjust x position for inventory
+		float y = 300.f + row * (slotSize + padding);  // Adjust y position for inventory
+
+		sf::FloatRect itemBounds(x, y, slotSize, slotSize);
+
+		// Check if mouse click is within item bounds
+		if (itemBounds.contains(static_cast<sf::Vector2f>(mousePosWindow)) && item->getId() == "potion_001") {
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !mousePressed ) {
+				mousePressed = true;
+
+				// Delegate to Shop's handleSell method
+				player->gainHP(2);
+
+				std::string itemId2 = item->getId();
+				playerInventory->removeItem(itemId2, 1);
+			}
+		}
+
+		currentSlot++;
+	}
+
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+		mousePressed = false;
+	}
 }
 
 
@@ -575,11 +680,11 @@ void GameState::updateInput(const float& dt)
 				if (this->lisa->getQuestState() == QuestState::IN_PROGRESS && this->playerInventory->getItemQuantity(flowerId) >= 2)
 					this->CompleteLisaQuest();
 			}
-
 			else {
 				// If the NPC is talking, go to the next part of the dialogue
 				this->lisa->nextDialogue();
 			}
+
 		}
 	}
 
@@ -673,6 +778,7 @@ void GameState::updateInventoryText(const float& dt)
 	this->inventoryTextcharisma.setString(sf::String(std::to_string(this->player->getAttributeComponent()->charisma)));
 	this->inventoryTexthealth.setString(sf::String(std::to_string(this->player->getAttributeComponent()->hpMax)));
 	this->inventoryTextlevel.setString(sf::String(std::to_string(this->player->getAttributeComponent()->level)));
+	this->inventoryTextmoney.setString(sf::String(std::to_string(this->player->getAttributeComponent()->money)));
 
 
 }
@@ -727,14 +833,25 @@ void GameState::update(const float& dt)
 
 		this->updateInventoryText(dt);
 
+		this->updateHealthBarwithPotion(this->mousePosWindow, playerInventory, player);
+
 		this->updateExpwhenComplete(dt);
+
+		shopmenu->update(this->mousePosWindow);
 	
+
     }
-	else //paused update
+	else if(!pauseForShop)//paused update
 	{
 	
 		this->pmenu->update(this->mousePosWindow);
 		this->updatePauseMenuButtons();
+		
+	}
+	else if(pauseForShop){
+
+		this->shopmenu->updateItemSelection(this->mousePosWindow,player);
+		this->updateItemSelection(this->mousePosWindow, playerInventory,shopmenu, player);
 	}
 
 }
@@ -761,6 +878,7 @@ void GameState::renderHouses(sf::RenderTarget& target)
 
 void GameState::renderInventoryMenu(sf::RenderTarget& target)
 {
+
 	target.draw(this->inventoryMenu);
 
 	target.draw(this->inventoryTextlevel);
@@ -772,8 +890,14 @@ void GameState::renderInventoryMenu(sf::RenderTarget& target)
 	target.draw(this->inventoryTextintelligence);
 	target.draw(this->inventoryTextcharisma);
 
+
 	/*this->inventory->renderInventory(target, *this->inventory, this->houseTextures["BLACKSMITH_HOUSE"], this->font);*/
 
+}
+
+void GameState::renderInventoryMoney(sf::RenderTarget& target)
+{
+	target.draw(this->inventoryTextmoney);
 }
 
 void GameState::render(sf::RenderTarget* target)
@@ -798,14 +922,16 @@ void GameState::render(sf::RenderTarget* target)
 	//Render player
 	this->player->render(this->renderTexture);
 
-	// Reset the view to default for GUI rendering
+	/////////////////////// Reset the view to default for GUI rendering
 	this->renderTexture.setView(this->renderTexture.getDefaultView());
 
 	//Render GUI
 	this->playerGUI->render(this->renderTexture);
 
+	//Render Quests
 	this->renderQuests(this->renderTexture);
 
+	//Render Dialogue
 	this->klee->renderDialogue(this->renderTexture);
 	this->lisa->renderDialogue(this->renderTexture);
 
@@ -813,13 +939,41 @@ void GameState::render(sf::RenderTarget* target)
 	if (this->isInventoryMenuOpen)
 {
 	this->renderInventoryMenu(this->renderTexture);
-	sf::Vector2f inventoryPosition(667, 300); // Example position
+	this->renderInventoryMoney(this->renderTexture);
+	sf::Vector2f inventoryPosition(667, 300); 
 	this->playerInventory->render(this->renderTexture , this->inventoryMenuTexture, inventoryPosition);
 }
 
-if (this->paused) //paused menu render
+	//Render Lisa Menu
+
+	if (this->lisaShopUnlocked && lisa->getIsTalking())
+		this->shopmenu->renderButtons(this->renderTexture);
+
+	//Render Shop Menu
+	if (lisaShopUnlocked)
+	{
+		if (this->shopmenu->isButtonPressed("OPEN SHOP"))
+		{
+			this->pauseForShop = true;
+			this->pauseState();
+			this->renderInventoryMenu(this->renderTexture);
+
+			sf::Vector2f inventoryPosition(667, 300);
+			this->playerInventory->render(this->renderTexture, this->inventoryMenuTexture, inventoryPosition);
+
+			sf::Vector2f shopPosition(1195, 342);
+			this->shopmenu->render(this->renderTexture, shopPosition);
+
+		}
+		if (this->shopmenu->isButtonPressed("CLOSE")) {
+			this->lisa->nextDialogue();
+			this->pauseForShop = false;
+		}
+	}
+
+	//Render Pause Menu
+if (this->paused && !this->pauseForShop)
 {
-	//this->renderTexture.setView(this->renderTexture.getDefaultView());
 	this->pmenu->render(this->renderTexture);
 }
 

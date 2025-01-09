@@ -73,6 +73,18 @@ void Player::gainExp(const unsigned exp)
 
 }
 
+void Player::gainMoney(const int money)
+{
+	this->attributeComponent->money += money;
+
+}
+
+void Player::loseMoney(const int money)
+{
+	this->attributeComponent->money -= money;
+
+}
+
 void Player::startAttackAnimation(const float& dt, int animationnumber)
 {
 	this->attacking = true;

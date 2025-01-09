@@ -24,14 +24,23 @@ Inventory::~Inventory()
     }*/
 }
 
+void Inventory::initItems()
+{
+    Item* healthPotion = new Item("potion_001", "Health Potion", 5, true, "assets/MF_Items/MF_Items_potions_9.png", 10);
+
+    Item* manaPotion = new Item("potion_002", "Mana Potion", 1, true, "assets/MF_Items/MF_Items_potions_11.png", 15);
+
+}
+
 void Inventory::addItem(Item* item)
 {
     if (item->getIsStackable() && items.find(item->getId()) != items.end()) {
-        items[item->getId()]->setQuantity(items[item->getId()]->getQuantity() + item->getQuantity());
+        items[item->getId()]->setQuantity(items[item->getId()]->getQuantity() + 1);
         delete item; // Free memory for the incoming item
     }
     else {
         items[item->getId()] = item; // Store the new item
+        items[item->getId()]->setQuantity(1);
     }
 }
 
@@ -52,6 +61,7 @@ void Inventory::removeItem(std::string& id, int quantity)
     }
 }
 
+
 int Inventory::getItemQuantity(const std::string& itemId) const
 {
     auto it = items.find(itemId);  // Search for the item by its ID
@@ -64,6 +74,11 @@ int Inventory::getItemQuantity(const std::string& itemId) const
 const std::map<std::string, Item*>& Inventory::getItems() const
 {
 	return items;
+}
+
+Item* Inventory::getItem(const std::string& id)
+{
+   /* return items[id]*/;
 }
 
 

@@ -30,6 +30,9 @@ public:
 	int accuracy;
 	int luck;
 
+	//Money
+	int money;
+
 	//Constructor / Destructor
 	AttributeComponent();
 	virtual ~AttributeComponent();
@@ -39,6 +42,7 @@ public:
 
 
 	void gainExp(const unsigned exp);
+	int getMoney() const;
 
 	void updateStats(const bool reset);
 	void updateLevel();

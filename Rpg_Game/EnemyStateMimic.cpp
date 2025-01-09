@@ -247,7 +247,6 @@ void EnemyStateMimic::switchTurn()
 {
 	this->turn = (this->turn == 1) ? 0 : 1;
 	this->updateTurnText();
-	std::cout << "Turn switched!" << std::endl;
 }
 
 void EnemyStateMimic::startDelay(const float duration)
@@ -335,7 +334,6 @@ void EnemyStateMimic::updateGame(const float& dt)
 	if (this->turn == 1)
 	{
 		if (this->buttons["MOON"]->isPressed() && this->isButtonPressed("MOON")) {
-			std::cout << "Moon button pressed!" << std::endl;
 
 			this->player->startAttackAnimation(dt, 1);
 
@@ -344,7 +342,6 @@ void EnemyStateMimic::updateGame(const float& dt)
 			this->startDelay(3.f);
 		}
 		else if (this->buttons["CIRCLE"]->isPressed() && this->isButtonPressed("CIRCLE")) {
-			std::cout << "Circle button pressed!" << std::endl;
 
 			this->player->startAttackAnimation(dt, 2);
 
@@ -353,7 +350,6 @@ void EnemyStateMimic::updateGame(const float& dt)
 			this->startDelay(3.f);
 		}
 		else if (this->buttons["IDK"]->isPressed() && this->isButtonPressed("IDK")) {
-			std::cout << "Idk button pressed!" << std::endl;
 
 			this->player->startAttackAnimation(dt, 3);
 
@@ -362,7 +358,6 @@ void EnemyStateMimic::updateGame(const float& dt)
 			this->startDelay(4.f);
 		}
 		else if (this->buttons["STARS"]->isPressed() && this->isButtonPressed("STARS")) {
-			std::cout << "Stars button pressed!" << std::endl;
 
 			this->player->startAttackAnimation(dt, 4);
 
